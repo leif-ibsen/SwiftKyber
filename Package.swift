@@ -13,8 +13,8 @@ let package = Package(
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
-        .package(url: "../BigInt", from: "1.14.0"),
-        .package(url: "../ASN1", from: "2.2.0"),
+        .package(url: "https://github.com/leif-ibsen/BigInt", from: "1.14.0"),
+        .package(url: "https://github.com/leif-ibsen/ASN1", from: "2.2.0"),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.

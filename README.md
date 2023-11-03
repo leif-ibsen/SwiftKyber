@@ -16,7 +16,7 @@ SwiftKyber makes it possible to explore CRYSTALS-Kyber in a Swift context.
 In your project Package.swift file add a dependency like<br/>
 
 	  dependencies: [
-	  .package(url: "https://github.com/leif-ibsen/SwiftKyber", from: "1.0.0"),
+	  .package(url: "https://github.com/leif-ibsen/SwiftKyber", from: "1.1.0"),
 	  ]
 <h2 id="basic"><b>How it Works</b></h2>
 Suppose Alice and Bob wish to share a secret key they can use as a symmetric encryption key:<br/>
