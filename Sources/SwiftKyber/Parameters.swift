@@ -7,6 +7,7 @@
 
 import ASN1
 
+// Parameters for the three Kyber instances
 struct KyberParameters {
     
     let k: Int

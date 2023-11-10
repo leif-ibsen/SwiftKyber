@@ -16,7 +16,7 @@ SwiftKyber makes it possible to explore CRYSTALS-Kyber in a Swift context.
 In your project Package.swift file add a dependency like<br/>
 
 	  dependencies: [
-	  .package(url: "https://github.com/leif-ibsen/SwiftKyber", from: "1.1.0"),
+	  .package(url: "https://github.com/leif-ibsen/SwiftKyber", from: "1.2.0"),
 	  ]
 <h2 id="basic"><b>How it Works</b></h2>
 Suppose Alice and Bob wish to share a secret key they can use as a symmetric encryption key:<br/>
@@ -114,7 +114,7 @@ It may change, there may be no ASN1 structure at all or I may have misread [KEYS
 SwiftKyber's key generation, encapsulation and decapsulation performance was measured on an iMac 2021, Apple M1 chip.
 The table below shows the figures in milli seconds for the three Kyber instances.
 <table width="75%">
-<tr><th align="left" width="25%">Kyber Instance</th><th align="right" width="25%">GenerateKeyPair</th><th align="right" width="20%">Encapsulate</th><th align="right" width="20%">Decapsulate</th></tr>
+<tr><th align="left" width="25%">Instance</th><th align="right" width="25%">GenerateKeyPair</th><th align="right" width="20%">Encapsulate</th><th align="right" width="20%">Decapsulate</th></tr>
 <tr><td>Kyber.K512</td><td align="right">0.21 mSec</td><td align="right">0.22 mSec</td><td align="right">0.25 mSec</td></tr>
 <tr><td>Kyber.K768</td><td align="right">0.36 mSec</td><td align="right">0.38 mSec</td><td align="right">0.42 mSec</td></tr>
 <tr><td>Kyber.K1024</td><td align="right">0.57 mSec</td><td align="right">0.58 mSec</td><td align="right">0.64 mSec</td></tr>

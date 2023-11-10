@@ -14,6 +14,7 @@ public struct PublicKey: Equatable, CustomStringConvertible {
     let rhoStart: Int
     let kyber: Kyber
 
+    
     // MARK: Initializers
     
     /// Creates a PublicKey from its key bytes
@@ -118,7 +119,7 @@ public struct PublicKey: Equatable, CustomStringConvertible {
                     .add(ASN1OctetString(self.t))
                     .add(ASN1OctetString(self.rho)).encode(),
                 0))
-    }  catch { return ASN1.NULL} } }
+    }  catch { return ASN1.NULL /* Can't happen */ } } }
     
     /// The DER encoding of *self*
     public var der: Bytes { get { return self.asn1.encode() } }
@@ -150,6 +151,11 @@ public struct PublicKey: Equatable, CustomStringConvertible {
     /// - Returns: The ciphertext *ct* and the shared secret *K*
     public func Encapsulate() -> (ct: Bytes, K: Bytes) {
         return self.kyber.CCAKEM_Enc(self, [])
+    }
+
+    // Only used from the KAT test cases
+    func Encapsulate(_ seed: Bytes) -> (ct: Bytes, K: Bytes) {
+        return self.kyber.CCAKEM_Enc(self, seed)
     }
     
 }

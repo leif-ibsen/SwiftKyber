@@ -23,15 +23,16 @@ final class KAT1024Test: XCTestCase {
     var katTests: [Util.katTest] = []
 
     func test() throws {
-        let kyber = Kyber.K1024
         for t in katTests {
-            let (pk, sk) = kyber.CCAKEM_KeyGen(t.d + t.z)
+            let (pk, sk) = Kyber.K1024.CCAKEM_KeyGen(t.d + t.z)
             XCTAssertEqual(pk, t.pk)
             XCTAssertEqual(sk, t.sk)
-            let (ct, ss) = kyber.CCAKEM_Enc(try PublicKey(bytes: pk), t.m)
+            let PK = try PublicKey(bytes: pk)
+            let SK = try SecretKey(bytes: sk)
+            let (ct, ss) = PK.Encapsulate(t.m)
             XCTAssertEqual(ct, t.ct)
             XCTAssertEqual(ss, t.ss)
-            XCTAssertEqual(kyber.CCAKEM_Dec(ct, try SecretKey(bytes: sk)), t.ss)
+            XCTAssertEqual(try SK.Decapsulate(ct: ct), ss)
         }
     }
 

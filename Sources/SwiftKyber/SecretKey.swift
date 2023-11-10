@@ -17,6 +17,7 @@ public struct SecretKey: Equatable, CustomStringConvertible {
     let zStart: Int
     let kyber: Kyber
     
+    
     // MARK: Initializers
     
     /// Creates a SecretKey from its key bytes
@@ -51,7 +52,7 @@ public struct SecretKey: Equatable, CustomStringConvertible {
             throw KyberException.skSize(value: bytes.count)
         }
         let pkBytes = Bytes(self.bytes[self.tStart ..< self.hStart])
-        if Kyber.H(pkBytes) != Bytes(bytes[self.hStart ..< self.zStart]) {
+        if self.kyber.H(pkBytes) != Bytes(bytes[self.hStart ..< self.zStart]) {
             throw KyberException.skInconsistent
         }
         self.publicKey = try PublicKey(bytes: pkBytes)

@@ -18,6 +18,7 @@ public typealias Bytes = [UInt8]
 /// so it is not possible to create other instances.
 public struct Kyber {
     
+    
     // MARK: Kyber instances
     
     /// The Kyber512 instance
@@ -74,6 +75,9 @@ public struct Kyber {
     let publicKeySize: Int
     let secretKeySize: Int
     let cipherTextSize: Int
+    let sha256: SHA3_256
+    let sha512: SHA3_512
+    let shake256: SHAKE256
 
     init(_ kp: KyberParameters) {
         self.k = kp.k
@@ -87,53 +91,87 @@ public struct Kyber {
         self.secretKeySize = self.sSize + self.publicKeySize + Kyber.hSize + Kyber.zSize
         self.cipherTextSize = (self.k * self.du + self.dv) * Kyber.N32
         self.OID = kp.oid
+        self.sha256 = SHA3_256()
+        self.sha512 = SHA3_512()
+        self.shake256 = SHAKE256()
     }
     
-    static func Round(_ a: Int, _ b: Int) -> Int {
-        let (q, r) = a.quotientAndRemainder(dividingBy: b)
-        return r * 2 >= b ? q + 1 : q
+    
+    // Message digest helper functions
+    
+    func H(_ seed: Bytes) -> Bytes {
+        self.sha256.update(seed)
+        return self.sha256.digest()
     }
     
-    static func Compress(_ x: Int, _ d: Int) -> Int {
-        assert(0 <= x && x < Kyber.Q)
-        assert(0 <= d && d < 12)
-        return Kyber.Round(x << d, Kyber.Q) & (1 << d - 1)
-    }
-    
-    static func Decompress(_ x: Int, _ d: Int) -> Int {
-        assert(0 <= x && x < Kyber.Q)
-        assert(0 <= d && d < 12)
-        return Kyber.Round(x * Kyber.Q, 1 << d)
-    }
-
-    static func H(_ seed: Bytes) -> Bytes {
-        let sha = SHA3_256()
-        sha.update(seed)
-        return sha.digest()
-    }
-    
-    static func G(_ seed: Bytes) -> (Bytes, Bytes) {
-        let sha = SHA3_512()
-        sha.update(seed)
-        let x = sha.digest()
+    func G(_ seed: Bytes) -> (Bytes, Bytes) {
+        self.sha512.update(seed)
+        let x = self.sha512.digest()
         return (Bytes(x[0 ..< 32]), Bytes(x[32 ..< 64]))
     }
     
-    static func PRF(_ seed: Bytes, _ n: Int) -> Bytes {
-        let shake = SHAKE256()
-        shake.update(seed)
-        return shake.digest(n)
+    func PRF(_ seed: Bytes, _ N: Byte, _ eta: Int) -> Bytes {
+        self.shake256.update(seed + [N])
+        return self.shake256.digest(eta << 6)
     }
 
-    static func KDF(_ seed: Bytes) -> Bytes {
-        let shake = SHAKE256()
-        shake.update(seed)
-        return shake.digest(32)
+    func KDF(_ seed: Bytes) -> Bytes {
+        self.shake256.update(seed)
+        return self.shake256.digest(32)
     }
     
+    
+    // Compression and decompression
+    
+    func Compress(_ x: Int, _ d: Int) -> Int {
+        assert(0 <= x && x < Kyber.Q)
+        assert(0 <= d && d < 12)
+        let (q, r) = (x << d).quotientAndRemainder(dividingBy: Kyber.Q)
+        return (r * 2 >= Kyber.Q ? q + 1 : q) & (1 << d - 1)
+    }
+    
+    func Compress(_ p: Polynomial, _ d: Int) -> Polynomial {
+        var x = Polynomial()
+        for i in 0 ..< Kyber.N {
+            x.coefficient[i] = Compress(p.coefficient[i], d)
+        }
+        return x
+    }
+
+    func Compress(_ v: Vector, _ d: Int) -> Vector {
+        var x = Vector(v.n)
+        for i in 0 ..< v.n {
+            x.polynomial[i] = Compress(v.polynomial[i], d)
+        }
+        return x
+    }
+
+    func Decompress(_ x: Int, _ d: Int) -> Int {
+        assert(0 <= x && x < Kyber.Q)
+        assert(0 <= d && d < 12)
+        let (q, r) = (x * Kyber.Q).quotientAndRemainder(dividingBy: 1 << d)
+        return r * 2 >= 1 << d ? q + 1 : q
+    }
+
+    func Decompress(_ p: Polynomial, _ d: Int) -> Polynomial {
+        var x = Polynomial()
+        for i in 0 ..< Kyber.N {
+            x.coefficient[i] = Decompress(p.coefficient[i], d)
+        }
+        return x
+    }
+
+    func Decompress(_ v: Vector, _ d: Int) -> Vector {
+        var x = Vector(v.n)
+        for i in 0 ..< v.n {
+            x.polynomial[i] = Decompress(v.polynomial[i], d)
+        }
+        return x
+    }
+
     // [KYBER] - Algorithm 1
-    static func Parse(_ xof: XOF) -> [Int] {
-        var a = [Int](repeating: 0, count: Kyber.N)
+    func Parse(_ xof: XOF) -> Polynomial {
+        var x = [Int](repeating: 0, count: Kyber.N)
         var j = 0
         while j < Kyber.N {
             let b = xof.read(3)
@@ -143,26 +181,26 @@ public struct Kyber {
             let d1 = b0 + (b1 & 0xf) << 8
             let d2 = b1 >> 4 + b2 << 4
             if d1 < Kyber.Q {
-                a[j] = d1
+                x[j] = d1
                 j += 1
             }
             if d2 < Kyber.Q && j < Kyber.N {
-                a[j] = d2
+                x[j] = d2
                 j += 1
             }
         }
-        return a
+        return Polynomial(x)
     }
 
     // [KYBER] - Algorithm 2
-    static func CBD(_ x: Bytes) -> Polynomial {
-        assert(x.count == 128 || x.count == 192)
+    func CBD(_ x: Bytes, _ eta: Int) -> Polynomial {
+        assert(x.count == eta << 6)
         let onebits: [Int] = [0, 1, 1, 2, 1, 2, 2, 3]
         var f = [Int](repeating: 0, count: Kyber.N)
         var a: Int
         var b: Int
         var bitNo = 0
-        if x.count == 128 {
+        if eta == 2 {
             for i in 0 ..< Kyber.N {
                 let byteNo = bitNo >> 3
                 switch bitNo & 0x7 {
@@ -176,9 +214,10 @@ public struct Kyber {
                     fatalError("CBD")
                 }
                 bitNo += 4
-                f[i] = Polynomial.sub(onebits[a], onebits[b])
+                f[i] = Kyber.subModQ(onebits[a], onebits[b])
             }
         } else {
+            assert(eta == 3)
             for i in 0 ..< Kyber.N {
                 let byteNo = bitNo >> 3
                 switch bitNo & 0x7 {
@@ -198,39 +237,61 @@ public struct Kyber {
                     fatalError("CBD")
                 }
                 bitNo += 6
-                f[i] = Polynomial.sub(onebits[a], onebits[b])
+                f[i] = Kyber.subModQ(onebits[a], onebits[b])
             }
         }
         return Polynomial(f)
     }
 
     // [KYBER] - Algorithm 3
-    static func Decode(_ bytes: Bytes) -> [Int] {
+    func Decode(_ bytes: Bytes) -> Polynomial {
         assert(bytes.count & 0x1f == 0)
         let l = bytes.count >> 5
         var x = [Int](repeating: 0, count: Kyber.N)
+        var il = 0
         for i in 0 ..< x.count {
-            let il = i * l
             for j in 0 ..< l {
-                x[i] += (Int(bytes[(il + j) >> 3] >> ((il + j) & 0x7)) & 1) << j
+                x[i] |= (Int(bytes[(il + j) >> 3] >> ((il + j) & 0x7)) & 1) << j
             }
+            il += l
+        }
+        return Polynomial(x)
+    }
+
+    func Decode(_ x: Bytes, _ l: Int) -> Vector {
+        let step = l << 5
+        let n = x.count / step
+        var v = Vector(n)
+        var from = 0
+        for i in 0 ..< n {
+            v.polynomial[i] = Decode(Bytes(x[from ..< from + step]))
+            from += step
+        }
+        return v
+    }
+
+    func Encode(_ pol: Polynomial, _ l: Int) -> Bytes {
+        assert(0 < l && l <= 12)
+        var x = Bytes(repeating: 0, count: l << 5)
+        var il = 0
+        for i in 0 ..< Kyber.N {
+            for j in 0 ..< l {
+                if pol.coefficient[i] & (1 << j) != 0 {
+                    x[(il + j) >> 3] |= 1 << ((il + j) & 0x7)
+                }
+            }
+            il += l
         }
         return x
     }
 
-    static func Encode(_ x: [Int], _ l: Int) -> Bytes {
-        assert(x.count == Kyber.N)
+    func Encode(_ vec: Vector, _ l: Int) -> Bytes {
         assert(0 < l && l <= 12)
-        var b = Bytes(repeating: 0, count: l << 5)
-        for i in 0 ..< x.count {
-            let il = i * l
-            for j in 0 ..< l {
-                if x[i] & (1 << j) != 0 {
-                    b[(il + j) >> 3] |= 1 << ((il + j) & 0x7)
-                }
-            }
+        var x: Bytes = []
+        for i in 0 ..< vec.n {
+            x += Encode(vec.polynomial[i], l)
         }
-        return b
+        return x
     }
 
     // [KYBER] - Algorithm 4
@@ -242,28 +303,29 @@ public struct Kyber {
         } else {
             d = seed
         }
-        let (rho, sigma) = Kyber.G(d)
-        var N = 0
+        let (rho, sigma) = G(d)
+        var N = Byte(0)
         var Ahat = Matrix(self.k)
-        for row in 0 ..< self.k {
-            for col in 0 ..< self.k {
-                Ahat.vector[row].polynomial[col] = Polynomial(Kyber.Parse(XOF(rho + [Byte(col), Byte(row)])))
+        for i in 0 ..< self.k {
+            for j in 0 ..< self.k {
+                Ahat.vector[i].polynomial[j] = Parse(XOF(rho + [Byte(j), Byte(i)]))
             }
         }
         var s = Vector(self.k)
         for i in 0 ..< self.k {
-            s.polynomial[i] = Kyber.CBD(Kyber.PRF(sigma + [Byte(N)], self.eta1 << 6))
+            s.polynomial[i] = CBD(PRF(sigma, N, self.eta1), self.eta1)
             N += 1
         }
         var e = Vector(self.k)
         for i in 0 ..< self.k {
-            e.polynomial[i] = Kyber.CBD(Kyber.PRF(sigma + [Byte(N)], self.eta1 << 6))
+            e.polynomial[i] = CBD(PRF(sigma, N, self.eta1), self.eta1)
             N += 1
         }
         let sHat = s.NTT()
-        let tHat = Ahat * sHat + e.NTT()
-        let pk = tHat.Encode(12) + rho
-        let sk = sHat.Encode(12)
+        let eHat = e.NTT()
+        let tHat = Ahat * sHat + eHat
+        let pk = Encode(tHat, 12) + rho
+        let sk = Encode(sHat, 12)
         return (pk, sk)
     }
     
@@ -272,30 +334,32 @@ public struct Kyber {
         assert(pk.count == 12 * self.k * Kyber.N32 + 32)
         assert(m.count == 32)
         assert(coins.count == 32)
-        var N = 0
-        let tHat = Vector.Decode(pk, 12)
-        let rho = Bytes(pk[pk.count - 32 ..< pk.count])
+        var N = Byte(0)
+        let tHat = Decode(pk, 12)
+        let rho = Bytes(pk[pk.count - Kyber.rhoSize ..< pk.count])
         var AhatT = Matrix(self.k)
-        for row in 0 ..< self.k {
-            for col in 0 ..< self.k {
-                AhatT.vector[row].polynomial[col] = Polynomial(Kyber.Parse(XOF(rho + [Byte(row), Byte(col)])))
+        for i in 0 ..< self.k {
+            for j in 0 ..< self.k {
+                AhatT.vector[i].polynomial[j] = Parse(XOF(rho + [Byte(i), Byte(j)]))
             }
         }
         var r = Vector(self.k)
         for i in 0 ..< self.k {
-            r.polynomial[i] = Kyber.CBD(Kyber.PRF(coins + [Byte(N)], self.eta1 << 6))
+            r.polynomial[i] = CBD(PRF(coins, N, self.eta1), self.eta1)
             N += 1
         }
-        let rHat = r.NTT()
         var e1 = Vector(self.k)
         for i in 0 ..< self.k {
-            e1.polynomial[i] = Kyber.CBD(Kyber.PRF(coins + [Byte(N)], self.eta2 << 6))
+            e1.polynomial[i] = CBD(PRF(coins, N, self.eta2), self.eta2)
             N += 1
         }
-        let e2 = Kyber.CBD(Kyber.PRF(coins + [Byte(N)], self.eta2 << 6))
-        let u = ((AhatT * rHat).INTT() + e1).Compress(self.du)
-        let v = ((tHat * rHat).INTT() + e2 + Polynomial(Kyber.Decode(m)).Decompress(1)).Compress(self.dv)
-        return u.Encode(self.du) + v.Encode(self.dv)
+        let e2 = CBD(PRF(coins, N, self.eta2), self.eta2)
+        let rHat = r.NTT()
+        let u = (AhatT * rHat).INTT() + e1
+        let v = (tHat * rHat).INTT() + e2 + Decompress(Decode(m), 1)
+        let c1 = Encode(Compress(u, self.du), self.du)
+        let c2 = Encode(Compress(v, self.dv), self.dv)
+        return c1 + c2
     }
 
     //  [KYBER] - Algorithm 6
@@ -303,10 +367,10 @@ public struct Kyber {
         assert(sk.count == 12 * self.k * Kyber.N32)
         assert(ct.count == (self.du * self.k + self.dv) * Kyber.N32)
         let index = self.du * self.k * Kyber.N32
-        let u = Vector.Decode(Bytes(ct[0 ..< index]), self.du).Decompress(self.du)
-        let v = Polynomial(Kyber.Decode(Bytes(ct[index ..< ct.count]))).Decompress(self.dv)
-        let sHat = Vector.Decode(sk, 12)
-        return (v - (sHat * u.NTT()).INTT()).Compress(1).Encode(1)
+        let u = Decompress(Decode(Bytes(ct[0 ..< index]), self.du), self.du)
+        let v = Decompress(Decode(Bytes(ct[index ..< ct.count])), self.dv)
+        let sHat = Decode(sk, 12)
+        return Encode(Compress(v - (sHat * u.NTT()).INTT(), 1), 1)
     }
 
     // [KYBER] - Algorithm 7
@@ -322,7 +386,7 @@ public struct Kyber {
             z = Bytes(seed[32 ..< 64])
         }
         let (pk, sk) = CPAPKE_KeyGen(s1)
-        return (pk, sk + pk + Kyber.H(pk) + z)
+        return (pk, sk + pk + H(pk) + z)
     }
     
     // [KYBER] - Algorithm 8
@@ -334,23 +398,23 @@ public struct Kyber {
         } else {
             m = seed
         }
-        m = Kyber.H(m)
-        let (_K, r) = Kyber.G(m + Kyber.H(pk.bytes))
+        m = H(m)
+        let (_K, r) = G(m + H(pk.bytes))
         let ct = CPAPKE_Enc(pk.bytes, m, r)
-        let K = Kyber.KDF(_K + Kyber.H(ct))
+        let K = KDF(_K + H(ct))
         return (ct, K)
     }
 
     // [KYBER] - Algorithm 9
     func CCAKEM_Dec(_ ct: Bytes, _ sk: SecretKey) -> Bytes {
         let m = CPAPKE_Dec(sk.s, ct)
-        let (K, r) = Kyber.G(m + sk.h)
+        let (K, r) = G(m + sk.h)
         let _ct = CPAPKE_Enc(sk.t + sk.rho, m, r)
-        return Kyber.select(ct, _ct, Kyber.KDF(K + Kyber.H(ct)), Kyber.KDF(sk.z + Kyber.H(ct)))
+        return Select(ct, _ct, KDF(K + H(ct)), KDF(sk.z + H(ct)))
     }
 
     // Constant-time comparison of c1 and c2
-    static func select(_ c1: Bytes, _ c2: Bytes, _ ifEqual: Bytes, _ ifNotEqual: Bytes) -> Bytes {
+    func Select(_ c1: Bytes, _ c2: Bytes, _ ifEqual: Bytes, _ ifNotEqual: Bytes) -> Bytes {
         assert(c1.count == c2.count)
         var equal = true
         for i in 0 ..< c1.count {
@@ -359,4 +423,35 @@ public struct Kyber {
         return equal ? ifEqual : ifNotEqual
     }
  
+    
+    // Arithmetic modulo Kyber.Q
+    
+    // Addition modulo Kyber.Q
+    static func addModQ(_ a: Int, _ b: Int) -> Int {
+        assert(0 <= a && a < Kyber.Q)
+        assert(0 <= b && b < Kyber.Q)
+        let x = a + b
+        return x < Kyber.Q ? x : x - Kyber.Q
+    }
+    
+    // Subtraction modulo Kyber.Q
+    static func subModQ(_ a: Int, _ b: Int) -> Int {
+        assert(0 <= a && a < Kyber.Q)
+        assert(0 <= b && b < Kyber.Q)
+        let x = a - b
+        return x < 0 ? x + Kyber.Q : x
+    }
+    
+    // Barrett reduction stuff
+    static let bq = (1 << 32) / Kyber.Q
+    
+    // Multiplication modulo Kyber.Q using Barrett reduction
+    static func mulModQ(_ a: Int, _ b: Int) -> Int {
+        assert(0 <= a && a < Kyber.Q)
+        assert(0 <= b && b < Kyber.Q)
+        let x = a * b
+        let t = x - ((x * bq) >> 32) * Kyber.Q
+        return t < Kyber.Q ? t : t - Kyber.Q
+    }
+
 }
