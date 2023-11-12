@@ -26,14 +26,25 @@ final class SHAKETest: XCTestCase {
     }
 
     func testXOF() throws {
+        var bytes16 = Bytes(repeating: 0, count: 16)
+        var bytes8 = Bytes(repeating: 0, count: 8)
+        var bytes0 = Bytes(repeating: 0, count: 0)
+
         var xof = XOF(Bytes("".utf8))
-        XCTAssertEqual(Util.bytes2hex(xof.read(16)), "7f9c2ba4e88f827d616045507605853e")
+        xof.read(&bytes16)
+        XCTAssertEqual(Util.bytes2hex(bytes16), "7f9c2ba4e88f827d616045507605853e")
+
         xof = XOF(Bytes("abc".utf8))
-        XCTAssertEqual(Util.bytes2hex(xof.read(16)), "5881092dd818bf5cf8a3ddb793fbcba7")
+        xof.read(&bytes16)
+        XCTAssertEqual(Util.bytes2hex(bytes16), "5881092dd818bf5cf8a3ddb793fbcba7")
+
         xof = XOF(Bytes("hello123".utf8))
-        XCTAssertEqual(Util.bytes2hex(xof.read(8)), "1b85861510bc4d8e")
+        xof.read(&bytes8)
+        XCTAssertEqual(Util.bytes2hex(bytes8), "1b85861510bc4d8e")
+
         xof = XOF(Bytes("123".utf8))
-        XCTAssertEqual(Util.bytes2hex(xof.read(0)), "")
+        xof.read(&bytes0)
+        XCTAssertEqual(Util.bytes2hex(bytes0), "")
     }
 
 }

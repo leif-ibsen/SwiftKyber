@@ -66,7 +66,6 @@ struct Polynomial: Equatable {
     // Inverse Number Theoretic Transform
     func INTT() -> Polynomial {
         var x = self.coefficient
-        let inv2 = (Kyber.Q + 1) >> 1
         var layer = 2
         var zi = Kyber.N >> 1
         while layer < Kyber.N {
@@ -75,8 +74,8 @@ struct Polynomial: Equatable {
                 let z = Polynomial.zetas128[zi]
                 for j in offset ..< offset + layer {
                     let t = Kyber.subModQ(x[j + layer], x[j])
-                    x[j] = Kyber.mulModQ(inv2, Kyber.addModQ(x[j], x[j + layer]))
-                    x[j + layer] = Kyber.mulModQ(inv2, Kyber.mulModQ(z, t))
+                    x[j] = Kyber.mulModQ(Kyber.Q2, Kyber.addModQ(x[j], x[j + layer]))
+                    x[j + layer] = Kyber.mulModQ(Kyber.Q2, Kyber.mulModQ(z, t))
                 }
             }
             layer <<= 1

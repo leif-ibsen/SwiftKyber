@@ -24,9 +24,8 @@ final class CompressTest: XCTestCase {
     }
 
     func test() throws {
-        for _ in 0 ..< 1000 {
-            let x = Int.random(in: 0 ..< Kyber.Q)
-            for d in 0 ..< 12 {
+        for x in 0 ..< Kyber.Q {
+            for d in 1 ..< 12 {
                 let c = Kyber.K512.Compress(x, d)
                 XCTAssertTrue(0 <= c && c < 1 << d)
                 let x1 = Kyber.K512.Decompress(c, d)

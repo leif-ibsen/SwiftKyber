@@ -56,9 +56,8 @@ class XOF {
         self.ndx = 0
     }
     
-    func read(_ n: Int) -> Bytes {
-        var x = Bytes(repeating: 0, count: n)
-        for i in 0 ..< n {
+    func read(_ x: inout Bytes) {
+        for i in 0 ..< x.count {
             if self.ndx == self.buffer.count {
                 self.sha3.doBuffer()
                 self.buffer = Bytes(self.sha3.S[0 ..< self.buffer.count])
@@ -67,7 +66,6 @@ class XOF {
             x[i] = self.buffer[self.ndx]
             self.ndx += 1
         }
-        return x
     }
     
 }

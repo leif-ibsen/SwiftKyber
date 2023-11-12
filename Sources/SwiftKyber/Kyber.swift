@@ -61,6 +61,7 @@ public struct Kyber {
     static let N = 256
     static let N32 = 32
     static let Q = 3329
+    static let Q2 = 1665
     static let rhoSize = 32
     static let hSize = 32
     static let zSize = 32
@@ -125,9 +126,9 @@ public struct Kyber {
     
     func Compress(_ x: Int, _ d: Int) -> Int {
         assert(0 <= x && x < Kyber.Q)
-        assert(0 <= d && d < 12)
+        assert(0 < d && d < 12)
         let (q, r) = (x << d).quotientAndRemainder(dividingBy: Kyber.Q)
-        return (r * 2 >= Kyber.Q ? q + 1 : q) & (1 << d - 1)
+        return (r >= Kyber.Q2 ? q + 1 : q) & (1 << d - 1)
     }
     
     func Compress(_ p: Polynomial, _ d: Int) -> Polynomial {
@@ -148,9 +149,9 @@ public struct Kyber {
 
     func Decompress(_ x: Int, _ d: Int) -> Int {
         assert(0 <= x && x < Kyber.Q)
-        assert(0 <= d && d < 12)
-        let (q, r) = (x * Kyber.Q).quotientAndRemainder(dividingBy: 1 << d)
-        return r * 2 >= 1 << d ? q + 1 : q
+        assert(0 < d && d < 12)
+        let xQ = (x * Kyber.Q) >> (d - 1)
+        return xQ & 1 == 1 ? (xQ >> 1) + 1 : xQ >> 1
     }
 
     func Decompress(_ p: Polynomial, _ d: Int) -> Polynomial {
@@ -173,11 +174,18 @@ public struct Kyber {
     func Parse(_ xof: XOF) -> Polynomial {
         var x = [Int](repeating: 0, count: Kyber.N)
         var j = 0
+        let bufferSize = 504 // 3 * SHAKE128 buffer size
+        var xofBuffer = Bytes(repeating: 0, count: bufferSize)
+        var xofIndex = bufferSize
         while j < Kyber.N {
-            let b = xof.read(3)
-            let b0 = Int(b[0])
-            let b1 = Int(b[1])
-            let b2 = Int(b[2])
+            if xofIndex == bufferSize {
+                xof.read(&xofBuffer)
+                xofIndex = 0
+            }
+            let b0 = Int(xofBuffer[xofIndex])
+            let b1 = Int(xofBuffer[xofIndex + 1])
+            let b2 = Int(xofBuffer[xofIndex + 2])
+            xofIndex += 3
             let d1 = b0 + (b1 & 0xf) << 8
             let d2 = b1 >> 4 + b2 << 4
             if d1 < Kyber.Q {
@@ -276,9 +284,8 @@ public struct Kyber {
         var il = 0
         for i in 0 ..< Kyber.N {
             for j in 0 ..< l {
-                if pol.coefficient[i] & (1 << j) != 0 {
-                    x[(il + j) >> 3] |= 1 << ((il + j) & 0x7)
-                }
+                let bit = pol.coefficient[i] & (1 << j) != 0 ? Byte(1) : Byte(0)
+                x[(il + j) >> 3] |= bit << ((il + j) & 0x7)
             }
             il += l
         }
@@ -410,17 +417,17 @@ public struct Kyber {
         let m = CPAPKE_Dec(sk.s, ct)
         let (K, r) = G(m + sk.h)
         let _ct = CPAPKE_Enc(sk.t + sk.rho, m, r)
-        return Select(ct, _ct, KDF(K + H(ct)), KDF(sk.z + H(ct)))
+        return Equal(ct, _ct) ? KDF(K + H(ct)) : KDF(sk.z + H(ct))
     }
 
     // Constant-time comparison of c1 and c2
-    func Select(_ c1: Bytes, _ c2: Bytes, _ ifEqual: Bytes, _ ifNotEqual: Bytes) -> Bytes {
+    func Equal(_ c1: Bytes, _ c2: Bytes) -> Bool {
         assert(c1.count == c2.count)
         var equal = true
         for i in 0 ..< c1.count {
             equal = equal && (c1[i] == c2[i])
         }
-        return equal ? ifEqual : ifNotEqual
+        return equal
     }
  
     
