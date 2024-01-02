@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Base64 Structure Reference</title>
+    <title>DecapsulationKey Structure Reference</title>
     <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
     <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
     <meta charset='utf-8'>
@@ -13,8 +13,8 @@
     <script src="../js/jazzy.search.js" defer></script>
   </head>
   <body>
-    <a name="//apple_ref/swift/Struct/Base64" class="dashAnchor"></a>
-    <a title="Base64 Structure Reference"></a>
+    <a name="//apple_ref/swift/Struct/DecapsulationKey" class="dashAnchor"></a>
+    <a title="DecapsulationKey Structure Reference"></a>
     <header>
       <div class="content-wrapper">
         <p><a href="../index.html">SwiftKyber Docs</a> (100% documented)</p>
@@ -29,7 +29,7 @@
       <p id="breadcrumbs">
         <a href="../index.html">SwiftKyber Reference</a>
         <img id="carat" src="../img/carat.png" alt=""/>
-        Base64 Structure Reference
+        DecapsulationKey Structure Reference
       </p>
     </div>
     <div class="content-wrapper">
@@ -47,16 +47,13 @@
             <a href="../Structs.html">Structures</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a href="../Structs/Base64.html">Base64</a>
+                <a href="../Structs/DecapsulationKey.html">DecapsulationKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/EncapsulationKey.html">EncapsulationKey</a>
               </li>
               <li class="nav-group-task">
                 <a href="../Structs/Kyber.html">Kyber</a>
-              </li>
-              <li class="nav-group-task">
-                <a href="../Structs/PublicKey.html">PublicKey</a>
-              </li>
-              <li class="nav-group-task">
-                <a href="../Structs/SecretKey.html">SecretKey</a>
               </li>
             </ul>
           </li>
@@ -76,26 +73,25 @@
       <article class="main-content">
         <section>
           <section class="section">
-            <h1>Base64</h1>
+            <h1>DecapsulationKey</h1>
               <div class="declaration">
                 <div class="language">
                   
-                  <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">Base64</span></code></pre>
+                  <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">DecapsulationKey</span> <span class="p">:</span> <span class="kt">Equatable</span></code></pre>
 
                 </div>
               </div>
-            <p>There is no Base64 instances.
-Base64 exists to provide a namespace. It contains static functions for Base64 encoding and decoding.</p>
+            <p>The decapsulation key</p>
 
           </section>
           <section class="section task-group-section">
             <div class="task-group">
               <div class="task-name-container">
-                <a name="/Static%20Methods"></a>
-                <a name="//apple_ref/swift/Section/Static Methods" class="dashAnchor"></a>
+                <a name="/Initializers"></a>
+                <a name="//apple_ref/swift/Section/Initializers" class="dashAnchor"></a>
                 <div class="section-name-container">
-                  <a class="section-name-link" href="#/Static%20Methods"></a>
-                  <h3 class="section-name"><span>Static Methods</span>
+                  <a class="section-name-link" href="#/Initializers"></a>
+                  <h3 class="section-name"><span>Initializers</span>
 </h3>
                 </div>
               </div>
@@ -103,9 +99,9 @@ Base64 exists to provide a namespace. It contains static functions for Base64 en
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:10SwiftKyber6Base64V9pemEncodeySSSays5UInt8VG_SStFZ"></a>
-                    <a name="//apple_ref/swift/Method/pemEncode(_:_:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:10SwiftKyber6Base64V9pemEncodeySSSays5UInt8VG_SStFZ">pemEncode(_:<wbr>_:<wbr>)</a>
+                    <a name="/s:10SwiftKyber16DecapsulationKeyV8keyBytesACSays5UInt8VG_tKcfc"></a>
+                    <a name="//apple_ref/swift/Method/init(keyBytes:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:10SwiftKyber16DecapsulationKeyV8keyBytesACSays5UInt8VG_tKcfc">init(keyBytes:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -113,72 +109,10 @@ Base64 exists to provide a namespace. It contains static functions for Base64 en
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>PEM encodes a byte array</p>
-
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">pemEncode</span><span class="p">(</span><span class="n">_</span> <span class="nv">input</span><span class="p">:</span> <span class="kt"><a href="../Typealiases.html#/s:10SwiftKyber5Bytesa">Bytes</a></span><span class="p">,</span> <span class="n">_</span> <span class="nv">pem</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">String</span></code></pre>
-
-                        </div>
-                      </div>
-                      <div>
-                        <h4>Parameters</h4>
-                        <table class="graybox">
-                          <tbody>
-                            <tr>
-                              <td>
-                                <code>
-                                <em>input</em>
-                                </code>
-                              </td>
-                              <td>
-                                <div>
-                                  <p>Bytes to encode</p>
-                                </div>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td>
-                                <code>
-                                <em>pem</em>
-                                </code>
-                              </td>
-                              <td>
-                                <div>
-                                  <p>The PEM header- and footer string</p>
-                                </div>
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
-                      <div>
-                        <h4>Return Value</h4>
-                        <p>The Base64 PEM encoding of <em>input</em></p>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:10SwiftKyber6Base64V9pemDecodeySays5UInt8VGSS_SStKFZ"></a>
-                    <a name="//apple_ref/swift/Method/pemDecode(_:_:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:10SwiftKyber6Base64V9pemDecodeySays5UInt8VGSS_SStKFZ">pemDecode(_:<wbr>_:<wbr>)</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>PEM decodes a string</p>
+                        <p>Creates a decapsulation key from its key bytes</p>
 <div class="aside aside-throws">
     <p class="aside-title">Throws</p>
-    A <em>base64</em> exception or a <em>pemStructure</em> exception if the input is malformed
+    An exception if the key bytes has wrong size or are inconsistent
 
 </div>
 
@@ -187,7 +121,7 @@ Base64 exists to provide a namespace. It contains static functions for Base64 en
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">pemDecode</span><span class="p">(</span><span class="n">_</span> <span class="nv">input</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="n">_</span> <span class="nv">pem</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Typealiases.html#/s:10SwiftKyber5Bytesa">Bytes</a></span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">(</span><span class="nv">keyBytes</span><span class="p">:</span> <span class="kt"><a href="../Typealiases.html#/s:10SwiftKyber5Bytesa">Bytes</a></span><span class="p">)</span> <span class="k">throws</span></code></pre>
 
                         </div>
                       </div>
@@ -198,43 +132,40 @@ Base64 exists to provide a namespace. It contains static functions for Base64 en
                             <tr>
                               <td>
                                 <code>
-                                <em>input</em>
+                                <em>keyBytes</em>
                                 </code>
                               </td>
                               <td>
                                 <div>
-                                  <p>String to decode</p>
-                                </div>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td>
-                                <code>
-                                <em>pem</em>
-                                </code>
-                              </td>
-                              <td>
-                                <div>
-                                  <p>The expected PEM header- and footer string</p>
+                                  <p>The key bytes</p>
                                 </div>
                               </td>
                             </tr>
                           </tbody>
                         </table>
                       </div>
-                      <div>
-                        <h4>Return Value</h4>
-                        <p>The Base64 PEM decoding of <em>input</em></p>
-                      </div>
                     </section>
                   </div>
                 </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <div class="task-name-container">
+                <a name="/Stored%20Properties"></a>
+                <a name="//apple_ref/swift/Section/Stored Properties" class="dashAnchor"></a>
+                <div class="section-name-container">
+                  <a class="section-name-link" href="#/Stored%20Properties"></a>
+                  <h3 class="section-name"><span>Stored Properties</span>
+</h3>
+                </div>
+              </div>
+              <ul>
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:10SwiftKyber6Base64V6encodeySSSays5UInt8VG_SitFZ"></a>
-                    <a name="//apple_ref/swift/Method/encode(_:_:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:10SwiftKyber6Base64V6encodeySSSays5UInt8VG_SitFZ">encode(_:<wbr>_:<wbr>)</a>
+                    <a name="/s:10SwiftKyber16DecapsulationKeyV8keyBytesSays5UInt8VGvp"></a>
+                    <a name="//apple_ref/swift/Property/keyBytes" class="dashAnchor"></a>
+                    <a class="token" href="#/s:10SwiftKyber16DecapsulationKeyV8keyBytesSays5UInt8VGvp">keyBytes</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -242,14 +173,81 @@ Base64 exists to provide a namespace. It contains static functions for Base64 en
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Base64 encodes a byte array</p>
+                        <p>The key bytes</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">encode</span><span class="p">(</span><span class="n">_</span> <span class="nv">input</span><span class="p">:</span> <span class="kt"><a href="../Typealiases.html#/s:10SwiftKyber5Bytesa">Bytes</a></span><span class="p">,</span> <span class="n">_</span> <span class="nv">linesize</span><span class="p">:</span> <span class="kt">Int</span> <span class="o">=</span> <span class="mi">76</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">String</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">let</span> <span class="nv">keyBytes</span><span class="p">:</span> <span class="kt"><a href="../Typealiases.html#/s:10SwiftKyber5Bytesa">Bytes</a></span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:10SwiftKyber16DecapsulationKeyV013encapsulationD0AA013EncapsulationD0Vvp"></a>
+                    <a name="//apple_ref/swift/Property/encapsulationKey" class="dashAnchor"></a>
+                    <a class="token" href="#/s:10SwiftKyber16DecapsulationKeyV013encapsulationD0AA013EncapsulationD0Vvp">encapsulationKey</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The corresponding encapsulation key</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">let</span> <span class="nv">encapsulationKey</span><span class="p">:</span> <span class="kt"><a href="../Structs/EncapsulationKey.html">EncapsulationKey</a></span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <div class="task-name-container">
+                <a name="/Methods"></a>
+                <a name="//apple_ref/swift/Section/Methods" class="dashAnchor"></a>
+                <div class="section-name-container">
+                  <a class="section-name-link" href="#/Methods"></a>
+                  <h3 class="section-name"><span>Methods</span>
+</h3>
+                </div>
+              </div>
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:10SwiftKyber16DecapsulationKeyV2eeoiySbAC_ACtFZ"></a>
+                    <a name="//apple_ref/swift/Method/==(_:_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:10SwiftKyber16DecapsulationKeyV2eeoiySbAC_ACtFZ">==(_:<wbr>_:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Equality of two decapsulation keys</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="o">==</span> <span class="p">(</span><span class="nv">key1</span><span class="p">:</span> <span class="kt">DecapsulationKey</span><span class="p">,</span> <span class="nv">key2</span><span class="p">:</span> <span class="kt">DecapsulationKey</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Bool</span></code></pre>
 
                         </div>
                       </div>
@@ -260,24 +258,24 @@ Base64 exists to provide a namespace. It contains static functions for Base64 en
                             <tr>
                               <td>
                                 <code>
-                                <em>input</em>
+                                <em>key1</em>
                                 </code>
                               </td>
                               <td>
                                 <div>
-                                  <p>Bytes to encode</p>
+                                  <p>a decapsulation key</p>
                                 </div>
                               </td>
                             </tr>
                             <tr>
                               <td>
                                 <code>
-                                <em>linesize</em>
+                                <em>key2</em>
                                 </code>
                               </td>
                               <td>
                                 <div>
-                                  <p>Number of characters per line - 76 is default</p>
+                                  <p>a decapsulation key</p>
                                 </div>
                               </td>
                             </tr>
@@ -286,7 +284,7 @@ Base64 exists to provide a namespace. It contains static functions for Base64 en
                       </div>
                       <div>
                         <h4>Return Value</h4>
-                        <p>The Base64 encoding of <em>input</em></p>
+                        <p><em>true</em> if key1 and key2 are equal, <em>false</em> otherwise</p>
                       </div>
                     </section>
                   </div>
@@ -294,9 +292,9 @@ Base64 exists to provide a namespace. It contains static functions for Base64 en
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:10SwiftKyber6Base64V6decodeySays5UInt8VGSSKFZ"></a>
-                    <a name="//apple_ref/swift/Method/decode(_:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:10SwiftKyber6Base64V6decodeySays5UInt8VGSSKFZ">decode(_:<wbr>)</a>
+                    <a name="/s:10SwiftKyber16DecapsulationKeyV11Decapsulate2ctSays5UInt8VGAH_tKF"></a>
+                    <a name="//apple_ref/swift/Method/Decapsulate(ct:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:10SwiftKyber16DecapsulationKeyV11Decapsulate2ctSays5UInt8VGAH_tKF">Decapsulate(ct:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -304,10 +302,10 @@ Base64 exists to provide a namespace. It contains static functions for Base64 en
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Base64 decodes a string</p>
+                        <p>The decapsulation function</p>
 <div class="aside aside-throws">
     <p class="aside-title">Throws</p>
-    A <em>base64</em> exception if the input is malformed
+    A <em>cipherTextSize</em> exception if <em>ct</em> has wrong size
 
 </div>
 
@@ -316,7 +314,7 @@ Base64 exists to provide a namespace. It contains static functions for Base64 en
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">decode</span><span class="p">(</span><span class="n">_</span> <span class="nv">input</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Typealiases.html#/s:10SwiftKyber5Bytesa">Bytes</a></span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="kt">Decapsulate</span><span class="p">(</span><span class="nv">ct</span><span class="p">:</span> <span class="kt"><a href="../Typealiases.html#/s:10SwiftKyber5Bytesa">Bytes</a></span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Typealiases.html#/s:10SwiftKyber5Bytesa">Bytes</a></span></code></pre>
 
                         </div>
                       </div>
@@ -327,12 +325,12 @@ Base64 exists to provide a namespace. It contains static functions for Base64 en
                             <tr>
                               <td>
                                 <code>
-                                <em>input</em>
+                                <em>ct</em>
                                 </code>
                               </td>
                               <td>
                                 <div>
-                                  <p>String to decode</p>
+                                  <p>The ciphertext</p>
                                 </div>
                               </td>
                             </tr>
@@ -341,7 +339,7 @@ Base64 exists to provide a namespace. It contains static functions for Base64 en
                       </div>
                       <div>
                         <h4>Return Value</h4>
-                        <p>The Base64 decoding of <em>input</em></p>
+                        <p>The shared secret</p>
                       </div>
                     </section>
                   </div>
@@ -351,7 +349,7 @@ Base64 exists to provide a namespace. It contains static functions for Base64 en
           </section>
         </section>
         <section id="footer">
-          <p>&copy; 2023 <a class="link" href="" target="_blank" rel="external noopener"></a>. All rights reserved. (Last updated: 2023-11-12)</p>
+          <p>&copy; 2024 <a class="link" href="" target="_blank" rel="external noopener"></a>. All rights reserved. (Last updated: 2024-01-02)</p>
           <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.4</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
         </section>
       </article>

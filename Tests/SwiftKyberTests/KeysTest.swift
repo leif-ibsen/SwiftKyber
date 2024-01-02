@@ -11,22 +11,12 @@ import XCTest
 final class KeysTest: XCTestCase {
 
     func doTest(_ kyber: Kyber) throws {
-        let (pk, sk) = kyber.GenerateKeyPair()
-        XCTAssertEqual(pk, sk.publicKey)
-        XCTAssertEqual(pk.bytes, pk.t + pk.rho)
-        XCTAssertEqual(sk.bytes, sk.s + sk.t + sk.rho + sk.h + sk.z)
-        let pkPem = pk.pem
-        let pkDer = pk.der
-        let pk1 = try PublicKey(der: pkDer)
-        let pk2 = try PublicKey(pem: pkPem)
-        XCTAssertEqual(pk, pk1)
-        XCTAssertEqual(pk, pk2)
-        let skPem = sk.pem
-        let skDer = sk.der
-        let sk1 = try SecretKey(der: skDer)
-        let sk2 = try SecretKey(pem: skPem)
-        XCTAssertEqual(sk, sk1)
-        XCTAssertEqual(sk, sk2)
+        let (ek, dk) = kyber.GenerateKeyPair()
+        XCTAssertEqual(ek.keyBytes, dk.encapsulationKey.keyBytes)
+        let newEk = try EncapsulationKey(keyBytes: ek.keyBytes)
+        let newDk = try DecapsulationKey(keyBytes: dk.keyBytes)
+        XCTAssertEqual(ek, newEk)
+        XCTAssertEqual(dk, newDk)
     }
 
     func test() throws {

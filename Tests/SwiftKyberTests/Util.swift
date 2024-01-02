@@ -1,14 +1,14 @@
 //
-//  Util.swift
+//  File.swift
 //  
 //
-//  Created by Leif Ibsen on 20/10/2023.
+//  Created by Leif Ibsen on 21/12/2023.
 //
 
-import XCTest
+import Foundation
 @testable import SwiftKyber
 
-final class Util: XCTestCase {
+struct Util {
     
     static func hex2bytes(_ x: String) -> Bytes {
         let b = [Byte](x.utf8)
@@ -32,11 +32,12 @@ final class Util: XCTestCase {
     }
     
     struct katTest {
+        let seed: Bytes
         let d: Bytes
         let z: Bytes
+        let m: Bytes
         let pk: Bytes
         let sk: Bytes
-        let m: Bytes
         let ct: Bytes
         let ss: Bytes
     }
@@ -44,27 +45,29 @@ final class Util: XCTestCase {
     static func makeKatTests(_ katTests: inout [katTest], _ data: Data) {
         let s = String(decoding: data, as: UTF8.self)
         var lines = s.components(separatedBy: .newlines)
-        let groups = lines.count / 8
+        let groups = lines.count / 10
         for i in 0 ..< groups {
-            let j = i * 8
-            lines[j].removeFirst(4)
-            lines[j + 1].removeFirst(4)
-            lines[j + 2].removeFirst(5)
-            lines[j + 3].removeFirst(5)
+            let j = i * 10
+            lines[j + 1].removeFirst(7)
+            lines[j + 2].removeFirst(4)
+            lines[j + 3].removeFirst(4)
             lines[j + 4].removeFirst(4)
             lines[j + 5].removeFirst(5)
             lines[j + 6].removeFirst(5)
+            lines[j + 7].removeFirst(5)
+            lines[j + 8].removeFirst(5)
         }
         for i in 0 ..< groups {
-            let j = i * 8
-            let d = hex2bytes(lines[j])
-            let z = hex2bytes(lines[j + 1])
-            let pk = hex2bytes(lines[j + 2])
-            let sk = hex2bytes(lines[j + 3])
+            let j = i * 10
+            let seed = hex2bytes(lines[j + 1])
+            let d = hex2bytes(lines[j + 2])
+            let z = hex2bytes(lines[j + 3])
             let m = hex2bytes(lines[j + 4])
-            let ct = hex2bytes(lines[j + 5])
-            let ss = hex2bytes(lines[j + 6])
-            katTests.append(katTest(d: d, z: z, pk: pk, sk: sk, m: m, ct: ct, ss: ss))
+            let pk = hex2bytes(lines[j + 5])
+            let sk = hex2bytes(lines[j + 6])
+            let ct = hex2bytes(lines[j + 7])
+            let ss = hex2bytes(lines[j + 8])
+            katTests.append(katTest(seed: seed, d: d, z: z, m: m, pk: pk, sk: sk, ct: ct, ss: ss))
         }
     }
 

@@ -47,16 +47,13 @@
             <a href="Structs.html">Structures</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a href="Structs/Base64.html">Base64</a>
+                <a href="Structs/DecapsulationKey.html">DecapsulationKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Structs/EncapsulationKey.html">EncapsulationKey</a>
               </li>
               <li class="nav-group-task">
                 <a href="Structs/Kyber.html">Kyber</a>
-              </li>
-              <li class="nav-group-task">
-                <a href="Structs/PublicKey.html">PublicKey</a>
-              </li>
-              <li class="nav-group-task">
-                <a href="Structs/SecretKey.html">SecretKey</a>
               </li>
             </ul>
           </li>
@@ -86,9 +83,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:10SwiftKyber6Base64V"></a>
-                    <a name="//apple_ref/swift/Struct/Base64" class="dashAnchor"></a>
-                    <a class="token" href="#/s:10SwiftKyber6Base64V">Base64</a>
+                    <a name="/s:10SwiftKyber16DecapsulationKeyV"></a>
+                    <a name="//apple_ref/swift/Struct/DecapsulationKey" class="dashAnchor"></a>
+                    <a class="token" href="#/s:10SwiftKyber16DecapsulationKeyV">DecapsulationKey</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -96,16 +93,43 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>There is no Base64 instances.
-Base64 exists to provide a namespace. It contains static functions for Base64 encoding and decoding.</p>
+                        <p>The decapsulation key</p>
 
-                        <a href="Structs/Base64.html" class="slightly-smaller">See more</a>
+                        <a href="Structs/DecapsulationKey.html" class="slightly-smaller">See more</a>
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">Base64</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">DecapsulationKey</span> <span class="p">:</span> <span class="kt">Equatable</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:10SwiftKyber16EncapsulationKeyV"></a>
+                    <a name="//apple_ref/swift/Struct/EncapsulationKey" class="dashAnchor"></a>
+                    <a class="token" href="#/s:10SwiftKyber16EncapsulationKeyV">EncapsulationKey</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The encapsulation key</p>
+
+                        <a href="Structs/EncapsulationKey.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">EncapsulationKey</span> <span class="p">:</span> <span class="kt">Equatable</span></code></pre>
 
                         </div>
                       </div>
@@ -142,70 +166,12 @@ so it is not possible to create other instances.</p>
                     </section>
                   </div>
                 </li>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:10SwiftKyber9PublicKeyV"></a>
-                    <a name="//apple_ref/swift/Struct/PublicKey" class="dashAnchor"></a>
-                    <a class="token" href="#/s:10SwiftKyber9PublicKeyV">PublicKey</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>The internal representation of a public key is a byte array which is the concatenation of two byte arrays called <em>t</em> and <em>rho</em>.<br/>
-Please see [KYBER] for clarification.</p>
-
-                        <a href="Structs/PublicKey.html" class="slightly-smaller">See more</a>
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">PublicKey</span> <span class="p">:</span> <span class="kt">Equatable</span><span class="p">,</span> <span class="kt">CustomStringConvertible</span></code></pre>
-
-                        </div>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:10SwiftKyber9SecretKeyV"></a>
-                    <a name="//apple_ref/swift/Struct/SecretKey" class="dashAnchor"></a>
-                    <a class="token" href="#/s:10SwiftKyber9SecretKeyV">SecretKey</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>The internal representation of a secret key is a byte array which is the concatenation of five byte arrays called <em>s</em>, <em>t</em>, <em>rho</em>, <em>h</em> and <em>z</em>.<br/>
-Please see [KYBER] for clarification.</p>
-
-                        <a href="Structs/SecretKey.html" class="slightly-smaller">See more</a>
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">SecretKey</span> <span class="p">:</span> <span class="kt">Equatable</span><span class="p">,</span> <span class="kt">CustomStringConvertible</span></code></pre>
-
-                        </div>
-                      </div>
-                    </section>
-                  </div>
-                </li>
               </ul>
             </div>
           </section>
         </section>
         <section id="footer">
-          <p>&copy; 2023 <a class="link" href="" target="_blank" rel="external noopener"></a>. All rights reserved. (Last updated: 2023-11-12)</p>
+          <p>&copy; 2024 <a class="link" href="" target="_blank" rel="external noopener"></a>. All rights reserved. (Last updated: 2024-01-02)</p>
           <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.4</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
         </section>
       </article>

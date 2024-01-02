@@ -24,12 +24,15 @@ final class CompressTest: XCTestCase {
     }
 
     func test() throws {
-        for x in 0 ..< Kyber.Q {
-            for d in 1 ..< 12 {
-                let c = Kyber.K512.Compress(x, d)
+        for d in 1 ..< 12 {
+            for x in 0 ..< Kyber.Q {
+                let c = Kyber.Compress(x, d)
                 XCTAssertTrue(0 <= c && c < 1 << d)
-                let x1 = Kyber.K512.Decompress(c, d)
+                let x1 = Kyber.Decompress(c, d)
                 XCTAssertTrue(Swift.abs(modPM(x1 - x)) <= RoundQ(1 << (d + 1)))
+            }
+            for x in 0 ..< 1 << d {
+                XCTAssertEqual(Kyber.Compress(Kyber.Decompress(x, d), d), x)
             }
         }
     }

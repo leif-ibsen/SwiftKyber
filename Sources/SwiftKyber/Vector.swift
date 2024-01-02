@@ -1,6 +1,6 @@
 //
 //  Vector.swift
-//  SwiftKyberTest
+//  SwiftKyber
 //
 //  Created by Leif Ibsen on 10/10/2023.
 //
@@ -16,6 +16,43 @@ struct Vector: Equatable {
         self.n = n
     }
     
+    func Compress(_ d: Int) -> Vector {
+        var x = Vector(self.n)
+        for i in 0 ..< x.n {
+            x.polynomial[i] = self.polynomial[i].Compress(d)
+        }
+        return x
+    }
+
+    func Decompress(_ d: Int) -> Vector {
+        var x = Vector(self.n)
+        for i in 0 ..< x.n {
+            x.polynomial[i] = self.polynomial[i].Decompress(d)
+        }
+        return x
+    }
+    
+    func ByteEncode(_ d: Int) -> Bytes {
+        assert(0 < d && d <= 12)
+        var x: Bytes = []
+        for i in 0 ..< self.n {
+            x += self.polynomial[i].ByteEncode(d)
+        }
+        return x
+    }
+
+    static func ByteDecode(_ x: Bytes, _ d: Int) -> Vector {
+        let step = d << 5
+        let n = x.count / step
+        var v = Vector(n)
+        var from = 0
+        for i in 0 ..< n {
+            v.polynomial[i] = Polynomial(Kyber.ByteDecode(Bytes(x[from ..< from + step]), d))
+            from += step
+        }
+        return v
+    }
+
     // Number Theoretic Transform
     func NTT() -> Vector {
         var v = Vector(self.n)

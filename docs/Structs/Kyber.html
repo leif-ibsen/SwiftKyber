@@ -47,16 +47,13 @@
             <a href="../Structs.html">Structures</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a href="../Structs/Base64.html">Base64</a>
+                <a href="../Structs/DecapsulationKey.html">DecapsulationKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/EncapsulationKey.html">EncapsulationKey</a>
               </li>
               <li class="nav-group-task">
                 <a href="../Structs/Kyber.html">Kyber</a>
-              </li>
-              <li class="nav-group-task">
-                <a href="../Structs/PublicKey.html">PublicKey</a>
-              </li>
-              <li class="nav-group-task">
-                <a href="../Structs/SecretKey.html">SecretKey</a>
               </li>
             </ul>
           </li>
@@ -114,7 +111,7 @@ so it is not possible to create other instances.</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>The Kyber512 instance</p>
+                        <p>The K512 instance</p>
 
                       </div>
                       <div class="declaration">
@@ -141,7 +138,7 @@ so it is not possible to create other instances.</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>The Kyber768 instance</p>
+                        <p>The K768 instance</p>
 
                       </div>
                       <div class="declaration">
@@ -168,7 +165,7 @@ so it is not possible to create other instances.</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>The Kyber1024 instance</p>
+                        <p>The K1024 instance</p>
 
                       </div>
                       <div class="declaration">
@@ -176,46 +173,6 @@ so it is not possible to create other instances.</p>
                         <div class="language">
                           <p class="aside-title">Swift</p>
                           <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="k">let</span> <span class="nv">K1024</span><span class="p">:</span> <span class="kt">Kyber</span></code></pre>
-
-                        </div>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-              </ul>
-            </div>
-            <div class="task-group">
-              <div class="task-name-container">
-                <a name="/Stored%20properties"></a>
-                <a name="//apple_ref/swift/Section/Stored properties" class="dashAnchor"></a>
-                <div class="section-name-container">
-                  <a class="section-name-link" href="#/Stored%20properties"></a>
-                  <h3 class="section-name"><span>Stored properties</span>
-</h3>
-                </div>
-              </div>
-              <ul>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:10SwiftKyber0B0V3OID4ASN10D16ObjectIdentifierCSgvp"></a>
-                    <a name="//apple_ref/swift/Property/OID" class="dashAnchor"></a>
-                    <a class="token" href="#/s:10SwiftKyber0B0V3OID4ASN10D16ObjectIdentifierCSgvp">OID</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>The Kyber OID</p>
-
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">internal(set)</span> <span class="k">var</span> <span class="nv">OID</span><span class="p">:</span> <span class="kt">ASN1ObjectIdentifier</span><span class="o">!</span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
 
                         </div>
                       </div>
@@ -238,9 +195,9 @@ so it is not possible to create other instances.</p>
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:10SwiftKyber0B0V15GenerateKeyPairAA06PublicD0V2pk_AA06SecretD0V2sktyF"></a>
+                    <a name="/s:10SwiftKyber0B0V15GenerateKeyPairAA013EncapsulationD0V5encap_AA013DecapsulationD0V5decaptyF"></a>
                     <a name="//apple_ref/swift/Method/GenerateKeyPair()" class="dashAnchor"></a>
-                    <a class="token" href="#/s:10SwiftKyber0B0V15GenerateKeyPairAA06PublicD0V2pk_AA06SecretD0V2sktyF">GenerateKeyPair()</a>
+                    <a class="token" href="#/s:10SwiftKyber0B0V15GenerateKeyPairAA013EncapsulationD0V5encap_AA013DecapsulationD0V5decaptyF">GenerateKeyPair()</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -248,20 +205,20 @@ so it is not possible to create other instances.</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Generates a public key and a secret key</p>
+                        <p>Generates an encapsulation key and a decapsulation key</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="kt">GenerateKeyPair</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="nv">pk</span><span class="p">:</span> <span class="kt"><a href="../Structs/PublicKey.html">PublicKey</a></span><span class="p">,</span> <span class="nv">sk</span><span class="p">:</span> <span class="kt"><a href="../Structs/SecretKey.html">SecretKey</a></span><span class="p">)</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="kt">GenerateKeyPair</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="nv">encap</span><span class="p">:</span> <span class="kt"><a href="../Structs/EncapsulationKey.html">EncapsulationKey</a></span><span class="p">,</span> <span class="nv">decap</span><span class="p">:</span> <span class="kt"><a href="../Structs/DecapsulationKey.html">DecapsulationKey</a></span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>
                       <div>
                         <h4>Return Value</h4>
-                        <p>The public key <em>pk</em> and the secret key <em>sk</em></p>
+                        <p>The encapsulation key <em>encap</em> and the decapsulation key <em>decap</em></p>
                       </div>
                     </section>
                   </div>
@@ -271,7 +228,7 @@ so it is not possible to create other instances.</p>
           </section>
         </section>
         <section id="footer">
-          <p>&copy; 2023 <a class="link" href="" target="_blank" rel="external noopener"></a>. All rights reserved. (Last updated: 2023-11-12)</p>
+          <p>&copy; 2024 <a class="link" href="" target="_blank" rel="external noopener"></a>. All rights reserved. (Last updated: 2024-01-02)</p>
           <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.4</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
         </section>
       </article>

@@ -1,6 +1,6 @@
 //
 //  Polynomial.swift
-//  SwiftKyberTest
+//  SwiftKyber
 //
 //  Created by Leif Ibsen on 09/10/2023.
 //
@@ -9,7 +9,7 @@
 struct Polynomial: Equatable {
     
     // 17 ^ bitreversal(i) mod Kyber.Q, for i in 0 ..< 128
-    static let zetas128 = [
+    static let zetas1 = [
            1, 1729, 2580, 3289, 2642,  630, 1897,  848, 1062, 1919,  193,  797, 2786, 3260,  569, 1746,
          296, 2447, 1339, 1476, 3046,   56, 2240, 1333, 1426, 2094,  535, 2882, 2393, 2879, 1974,  821,
          289,  331, 3253, 1756, 1197, 2304, 2277, 2055,  650, 1977, 2513,  632, 2865,   33, 1320, 1915,
@@ -20,8 +20,8 @@ struct Polynomial: Equatable {
         2804, 1092,  403, 1026, 1143, 2150, 2775,  886, 1722, 1212, 1874, 1029, 2110, 2935,  885, 2154
     ]
     
-    // 17 ^ (2 * bitreversal(i / 2) + 1) mod Kyber.Q, for i in 0 ..< 256 by 2
-    static let zetas256 = [
+    // 17 ^ (2 * bitreversal(i) + 1) mod Kyber.Q, for i in 0 ..< 128
+    static let zetas2 = [
           17, 3312, 2761,  568,  583, 2746, 2649,  680, 1637, 1692,  723, 2606, 2288, 1041, 1100, 2229,
         1409, 1920, 2662,  667, 3281,   48,  233, 3096,  756, 2573, 2156, 1173, 3015,  314, 3050,  279,
         1703, 1626, 1651, 1678, 2789,  540, 1789, 1540, 1847, 1482,  952, 2377, 1461, 1868, 2687,  642,
@@ -35,67 +35,103 @@ struct Polynomial: Equatable {
     var coefficient: [Int]
     
     init() {
-        self.coefficient = [Int](repeating: 0, count: Kyber.N)
+        self.coefficient = [Int](repeating: 0, count: 256)
     }
     
     init(_ coefficient: [Int]) {
-        assert(coefficient.count == Kyber.N)
+        assert(coefficient.count == 256)
         self.coefficient = coefficient
     }
     
+    func Compress(_ d: Int) -> Polynomial {
+        var x = Polynomial()
+        for i in 0 ..< 256 {
+            x.coefficient[i] = Kyber.Compress(self.coefficient[i], d)
+        }
+        return x
+    }
+
+    func Decompress(_ d: Int) -> Polynomial {
+        var x = Polynomial()
+        for i in 0 ..< 256 {
+            x.coefficient[i] = Kyber.Decompress(self.coefficient[i], d)
+        }
+        return x
+    }
+    
+    func ByteEncode(_ d: Int) -> Bytes {
+        assert(0 < d && d <= 12)
+        return Kyber.ByteEncode(self.coefficient, d)
+    }
+
+    static func ByteDecode(_ bytes: Bytes, _ d: Int) -> Polynomial {
+        assert(bytes.count == d << 5)
+        return Polynomial(Kyber.ByteDecode(bytes, d))
+    }
+
     // Number Theoretic Transform
+    // [FIPS203] - Algorithm 8
     func NTT() -> Polynomial {
-        var x = self.coefficient
-        var layer = Kyber.N >> 1
-        var zi = 0
-        while layer >= 2 {
-            for offset in stride(from: 0, to: Kyber.N - layer, by: layer << 1) {
-                zi += 1
-                let z = Polynomial.zetas128[zi]
-                for j in offset ..< offset + layer {
-                    let t = Kyber.mulModQ(z, x[j + layer])
-                    x[j + layer] = Kyber.subModQ(x[j], t)
-                    x[j] = Kyber.addModQ(x[j], t)
+        var f = self.coefficient
+        var k = 1
+        var len = 128
+        while len >= 2 {
+            var start = 0
+            while start < 256 {
+                let zeta = Polynomial.zetas1[k]
+                k += 1
+                for j in start ..< start + len {
+                    let t = Kyber.reduceModQ(zeta * f[j + len])
+                    f[j + len] = Kyber.subModQ(f[j], t)
+                    f[j] = Kyber.addModQ(f[j], t)
                 }
+                start += len << 1
             }
-            layer >>= 1
+            len >>= 1
         }
-        return Polynomial(x)
+        return Polynomial(f)
     }
-    
+
     // Inverse Number Theoretic Transform
+    // [FIPS203] - Algorithm 9
     func INTT() -> Polynomial {
-        var x = self.coefficient
-        var layer = 2
-        var zi = Kyber.N >> 1
-        while layer < Kyber.N {
-            for offset in stride(from: 0, to: Kyber.N - layer, by: layer << 1) {
-                zi -= 1
-                let z = Polynomial.zetas128[zi]
-                for j in offset ..< offset + layer {
-                    let t = Kyber.subModQ(x[j + layer], x[j])
-                    x[j] = Kyber.mulModQ(Kyber.Q2, Kyber.addModQ(x[j], x[j + layer]))
-                    x[j + layer] = Kyber.mulModQ(Kyber.Q2, Kyber.mulModQ(z, t))
+        var f = self.coefficient
+        var k = 127
+        var len = 2
+        while len <= 128 {
+            var start = 0
+            while start < 256 {
+                let zeta = Polynomial.zetas1[k]
+                k -= 1
+                for j in start ..< start + len {
+                    let t = f[j]
+                    f[j] = Kyber.addModQ(t, f[j + len])
+                    f[j + len] = Kyber.reduceModQ(zeta * Kyber.subModQ(f[j + len], t))
                 }
+                start += len << 1
             }
-            layer <<= 1
+            len <<= 1
         }
-        return Polynomial(x)
+        for i in 0 ..< f.count {
+            f[i] = Kyber.reduceModQ(f[i] * 3303)  // 3303 = 128^-1 mod 3329
+        }
+        return Polynomial(f)
     }
-    
-    // p1 * p2
-    static func *(_ p1: Polynomial, _ p2: Polynomial) -> Polynomial {
-        var p = [Int](repeating: 0, count: Kyber.N)
-        for i in stride(from: 0, to: Kyber.N, by: 2) {
-            let x1 = p1.coefficient[i]
-            let x2 = p1.coefficient[i + 1]
-            let y1 = p2.coefficient[i]
-            let y2 = p2.coefficient[i + 1]
-            let z = zetas256[i >> 1]
-            p[i] = Kyber.addModQ(Kyber.mulModQ(x1, y1), Kyber.mulModQ(z, Kyber.mulModQ(x2, y2)))
-            p[i + 1] = Kyber.addModQ(Kyber.mulModQ(x2, y1), Kyber.mulModQ(x1, y2))
+
+    // f * g
+    // [FIPS203] - Algorithm 10
+    static func *(_ f: Polynomial, _ g: Polynomial) -> Polynomial {
+        var h = [Int](repeating: 0, count: 256)
+        for i in stride(from: 0, to: 256, by: 2) {
+            let x1 = f.coefficient[i]
+            let x2 = f.coefficient[i + 1]
+            let y1 = g.coefficient[i]
+            let y2 = g.coefficient[i + 1]
+            let z = zetas2[i >> 1]
+            h[i] = Kyber.addModQ(Kyber.reduceModQ(x1 * y1), Kyber.reduceModQ(z * Kyber.reduceModQ(x2 * y2)))
+            h[i + 1] = Kyber.addModQ(Kyber.reduceModQ(x2 * y1), Kyber.reduceModQ(x1 * y2))
         }
-        return Polynomial(p)
+        return Polynomial(h)
     }
     
     // p1 + p2
@@ -107,7 +143,7 @@ struct Polynomial: Equatable {
     
     // p1 += p2
     static func +=(_ p1: inout Polynomial, _ p2: Polynomial) {
-        for i in 0 ..< Kyber.N {
+        for i in 0 ..< 256 {
             p1.coefficient[i] = Kyber.addModQ(p1.coefficient[i], p2.coefficient[i])
         }
     }
@@ -121,7 +157,7 @@ struct Polynomial: Equatable {
     
     // p1 -= p2
     static func -=(_ p1: inout Polynomial, _ p2: Polynomial) {
-        for i in 0 ..< Kyber.N {
+        for i in 0 ..< 256 {
             p1.coefficient[i] = Kyber.subModQ(p1.coefficient[i], p2.coefficient[i])
         }
     }

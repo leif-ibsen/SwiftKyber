@@ -46,16 +46,13 @@
             <a href="Structs.html">Structures</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a href="Structs/Base64.html">Base64</a>
+                <a href="Structs/DecapsulationKey.html">DecapsulationKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Structs/EncapsulationKey.html">EncapsulationKey</a>
               </li>
               <li class="nav-group-task">
                 <a href="Structs/Kyber.html">Kyber</a>
-              </li>
-              <li class="nav-group-task">
-                <a href="Structs/PublicKey.html">PublicKey</a>
-              </li>
-              <li class="nav-group-task">
-                <a href="Structs/SecretKey.html">SecretKey</a>
               </li>
             </ul>
           </li>
@@ -89,16 +86,13 @@
 <li><a href="#ref">References</a></li>
 </ul>
 
-<p>SwiftKyber is a Swift implementation of the proposed PQC (Post Quantum Cryptography)
-key encapsulation mechanism: CRYSTALS-Kyber.</p>
-
-<p>SwiftKyber makes it possible to explore CRYSTALS-Kyber in a Swift context.</p>
+<p>SwiftKyber is a Swift implementation of NIST FIPS 203 (Draft): <em>Module-Lattice-based Key-Encapsulation Mechanism Standard, August 2023</em>.</p>
 
 <h2 id="use"><b>Usage</b></h2>
 
 <p>In your project Package.swift file add a dependency like<br/></p>
 <pre class="highlight plaintext"><code>  dependencies: [
-  .package(url: "https://github.com/leif-ibsen/SwiftKyber", from: "1.3.0"),
+  .package(url: "https://github.com/leif-ibsen/SwiftKyber", from: "2.0.0"),
   ]
 </code></pre>
 
@@ -107,27 +101,27 @@ key encapsulation mechanism: CRYSTALS-Kyber.</p>
 <p>Suppose Alice and Bob wish to share a secret key they can use as a symmetric encryption key:<br/></p>
 
 <ul>
-<li>Alice generates a Kyber key pair, <i>publicKey</i> and <i>secretKey</i>. She sends <i>publicKey</i> to Bob</li>
-<li>Bob runs <i>publicKey.Encapsulate()</i> to generate a shared secret <i>K</i> and a cipher text <i>cipher</i></li>
+<li>Alice generates a Kyber key pair, <i>encapKey</i> and <i>decapKey</i>. She sends <i>encapKey</i> to Bob</li>
+<li>Bob runs <i>encapKey.Encapsulate()</i> to generate a shared secret <i>K</i> and a cipher text <i>cipher</i></li>
 <li>Bob sends <i>cipher</i> to Alice</li>
-<li>Alice runs <i>secretKey.Decapsulate(ct: cipher)</i> to generate the same shared secret <i>K</i></li>
+<li>Alice runs <i>decapKey.Decapsulate(ct: cipher)</i> to generate the same shared secret <i>K</i></li>
 </ul>
 
 <p>SwiftKyber contains three static Kyber instances: <em>Kyber.K512</em>, <em>Kyber.K768</em> and <em>Kyber.K1024</em>
-corresponding to the three instances defined in the Kyber specification.<br/></p>
+corresponding to the three instances defined in FIPS 203.<br/></p>
 
 <p>Here is a <em>Kyber.K512</em> example:</p>
 <pre class="highlight plaintext"><code>import SwiftKyber
 
 // Alice:
-let (publicKey, secretKey) = Kyber.K512.GenerateKeyPair()
+let (encapKey, decapKey) = Kyber.K512.GenerateKeyPair()
 
 // Bob:
-let (cipher, K1) = publicKey.Encapsulate()
+let (K1, cipher) = encapKey.Encapsulate()
 print("Bob's K:  ", K1)
 
 // Alice:
-let K2 = try secretKey.Decapsulate(ct: cipher)
+let K2 = try decapKey.Decapsulate(ct: cipher)
 print("Alice's K:", K2)
 </code></pre>
 
@@ -138,109 +132,58 @@ Alice's K: [106, 169, 16, 187, 123, 157, 206, 223, 236, 143, 173, 180, 243, 130,
 
 <h2 id="key"><b>Key Representation</b></h2>
 
-<p>SwiftKyber public and secret keys can be stored in three formats:</p>
+<p>SwiftKyber keys can be stored as raw bytes and later recreated from the stored bytes.</p>
 
-<ul>
-<li>DER encoded - a byte array</li>
-<li>PEM encoded - a string</li>
-<li>As raw bytes</li>
-</ul>
-
-<p>The three main key management operations are:</p>
-
-<ul>
-<li>Generate new keys</li>
-<li>Store existing keys in DER or PEM format or as raw bytes</li>
-<li>Load keys from their DER or PEM encoding or from their raw bytes</li>
-</ul>
-
-<p>Generating new keys is easy:</p>
+<p>Example:</p>
 <pre class="highlight plaintext"><code>import SwiftKyber
 
-let (pk, sk) = Kyber.K768.GenerateKeyPair()
+let (encapKey, decapKey) = Kyber.K768.GenerateKeyPair()
+
+let encapKeyBytes = encapKey.keyBytes
+let decapKeyBytes = decapKey.keyBytes
+
+let newEncapKey = try EncapsulationKey(keyBytes: encapKeyBytes)
+let newDecapKey = try DecapsulationKey(keyBytes: decapKeyBytes)
+
+// newEncapKey is now equal to encapKey and newDecapKey is equal to decapKey
+
+assert(newEncapKey == encapKey)
+assert(newDecapKey == decapKey)
 </code></pre>
-
-<p>generates a new public key <em>pk</em> and a new secret key <em>sk</em> for the K768 instance.<br/>
-Keys can be stored in DER format, in PEM format or as raw bytes.</p>
-<pre class="highlight plaintext"><code>import SwiftKyber
-
-let (pk, _) = Kyber.K512.GenerateKeyPair()
-
-let pkDer = pk.der // The DER encoding - a byte array
-let pkPem = pk.pem // The PEM encoding - a String
-let pkBytes = pk.bytes // The raw bytes
-
-let newPkFromDER = try PublicKey(der: pkDer)
-let newPkFromPEM = try PublicKey(pem: pkPem)
-let newPkFromRaw = try PublicKey(bytes: pkBytes)
-
-assert(pk == newPkFromDER)
-assert(pk == newPkFromPEM)
-assert(pk == newPkFromRaw)
-</code></pre>
-
-<p>and for secret keys:</p>
-<pre class="highlight plaintext"><code>import SwiftKyber
-
-let (_, sk) = Kyber.K512.GenerateKeyPair()
-
-let skDer = sk.der // The DER encoding - a byte array
-let skPem = sk.pem // The PEM encoding - a String
-let skBytes = sk.bytes // The raw bytes
-
-let newSkFromDER = try SecretKey(der: skDer)
-let newSkFromPEM = try SecretKey(pem: skPem)
-let newSkFromRaw = try SecretKey(bytes: skBytes)
-
-assert(sk == newSkFromDER)
-assert(sk == newSkFromPEM)
-assert(sk == newSkFromRaw)
-</code></pre>
-
-<h3><b>ASN1 reservations</b></h3>
-
-<p>The DER and PEM formats are based on the ASN1 structure of the keys.
-These structures are defined in [KEYS], but it is my understanding that the ASN1 representation is not settled yet:
-It may change, there may be no ASN1 structure at all or I may have misread [KEYS].</p>
 
 <h2 id="perf"><b>Performance</b></h2>
 
 <p>SwiftKyber&rsquo;s key generation, encapsulation and decapsulation performance was measured on an iMac 2021, Apple M1 chip.
-The table below shows the figures in milli seconds for the three Kyber instances.</p>
+The table below shows the times in milli seconds for the three Kyber instances.</p>
 
 <table width="75%">
 <tr><th align="left" width="25%">Instance</th><th align="right" width="25%">GenerateKeyPair</th><th align="right" width="20%">Encapsulate</th><th align="right" width="20%">Decapsulate</th></tr>
-<tr><td>Kyber.K512</td><td align="right">0.14 mSec</td><td align="right">0.16 mSec</td><td align="right">0.18 mSec</td></tr>
-<tr><td>Kyber.K768</td><td align="right">0.22 mSec</td><td align="right">0.25 mSec</td><td align="right">0.28 mSec</td></tr>
-<tr><td>Kyber.K1024</td><td align="right">0.33 mSec</td><td align="right">0.36 mSec</td><td align="right">0.40 mSec</td></tr>
+<tr><td>Kyber.K512</td><td align="right">0.15 mSec</td><td align="right">0.13 mSec</td><td align="right">0.18 mSec</td></tr>
+<tr><td>Kyber.K768</td><td align="right">0.24 mSec</td><td align="right">0.21 mSec</td><td align="right">0.27 mSec</td></tr>
+<tr><td>Kyber.K1024</td><td align="right">0.36 mSec</td><td align="right">0.32 mSec</td><td align="right">0.39 mSec</td></tr>
 </table>
 
 <h2 id="dep"><b>Dependencies</b></h2>
 
-<p>The SwiftKyber package depends on the ASN1 and BigInt packages</p>
+<p>The SwiftKyber package depends on the Digest package</p>
 <pre class="highlight plaintext"><code>dependencies: [
-    .package(url: "https://github.com/leif-ibsen/ASN1", from: "2.2.0"),
-    .package(url: "https://github.com/leif-ibsen/BigInt", from: "1.14.0"),
+    .package(url: "https://github.com/leif-ibsen/Digest", from: "1.1.0"),
 ],
 </code></pre>
 
-<p>SwiftKyber does not do Big Integer arithmetic, but BigInt is a dependency because ASN1 depends on it.</p>
-
 <h2 id="ref"><b>References</b></h2>
 
-<p>Algorithms from the following papers have been used in the implementation.
+<p>Algorithms from the below paper have been used in the implementation.
 There are references in the source code where appropriate.</p>
 
 <ul>
-<li>[KYBER] - CRYSTALS-Kyber, Algorithm Specifications And Supporting Documentation, January 2021</li>
-<li>[DRAFT] - Kyber Post-Quantum KEM, draft-cfrg-schwabe-kyber-03, September 2023</li>
-<li>[KEYS] - Quantum Safe Cryptography Key Information for CRYSTALS-Kyber, October 2022</li>
+<li>[FIPS203] - Module-Lattice-based Key-Encapsulation Mechanism Standard, August 2023</li>
 </ul>
 
           </section>
         </section>
         <section id="footer">
-          <p>&copy; 2023 <a class="link" href="" target="_blank" rel="external noopener"></a>. All rights reserved. (Last updated: 2023-11-12)</p>
+          <p>&copy; 2024 <a class="link" href="" target="_blank" rel="external noopener"></a>. All rights reserved. (Last updated: 2024-01-02)</p>
           <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.4</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
         </section>
       </article>

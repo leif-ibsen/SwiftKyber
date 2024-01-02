@@ -1,6 +1,6 @@
 //
 //  Matrix.swift
-//  SwiftKyberTest
+//  SwiftKyber
 //
 //  Created by Leif Ibsen on 11/10/2023.
 //

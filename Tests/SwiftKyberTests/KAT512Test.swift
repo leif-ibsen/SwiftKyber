@@ -8,31 +8,28 @@
 import XCTest
 @testable import SwiftKyber
 
-// Test vectors from GitHub - itzmeanjan
 final class KAT512Test: XCTestCase {
 
-    override func setUpWithError() throws {
-        let url = Bundle.module.url(forResource: "kyber512", withExtension: "kat")!
-        Util.makeKatTests(&katTests, try Data(contentsOf: url))
-    }
+    // Test vectors from GitHub: Krzystof Kwiatkowski
 
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
+    override func setUpWithError() throws {
+        let url = Bundle.module.url(forResource: "kat512", withExtension: "rsp")!
+        Util.makeKatTests(&katTests, try Data(contentsOf: url))
     }
 
     var katTests: [Util.katTest] = []
 
     func test() throws {
         for t in katTests {
-            let (pk, sk) = Kyber.K512.CCAKEM_KeyGen(t.d + t.z)
-            XCTAssertEqual(pk, t.pk)
-            XCTAssertEqual(sk, t.sk)
-            let PK = try PublicKey(bytes: pk)
-            let SK = try SecretKey(bytes: sk)
-            let (ct, ss) = PK.Encapsulate(t.m)
-            XCTAssertEqual(ct, t.ct)
+            let (ek, dk) = Kyber.K512.KEMKeyGen(t.d + t.z)
+            XCTAssertEqual(ek, t.pk)
+            XCTAssertEqual(dk, t.sk)
+            let EK = try EncapsulationKey(keyBytes: ek)
+            let DK = try DecapsulationKey(keyBytes: dk)
+            let (ss, ct) = EK.Encapsulate(t.m)
             XCTAssertEqual(ss, t.ss)
-            XCTAssertEqual(try SK.Decapsulate(ct: ct), ss)
+            XCTAssertEqual(ct, t.ct)
+            XCTAssertEqual(try DK.Decapsulate(ct: ct), ss)
         }
     }
 
