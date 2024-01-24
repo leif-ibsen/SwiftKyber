@@ -11,8 +11,16 @@ public struct DecapsulationKey: Equatable {
     
     let kyber: Kyber
     
+    // MARK: Stored Properties
     
-    // MARK: Initializers
+    /// The key bytes
+    public let keyBytes: Bytes
+    
+    /// The corresponding encapsulation key
+    public let encapsulationKey: EncapsulationKey
+    
+
+    // MARK: Constructors
     
     /// Creates a decapsulation key from its key bytes
     ///
@@ -44,26 +52,7 @@ public struct DecapsulationKey: Equatable {
     }
 
 
-    // MARK: Stored Properties
-    
-    /// The key bytes
-    public let keyBytes: Bytes
-    
-    /// The corresponding encapsulation key
-    public let encapsulationKey: EncapsulationKey
-    
-    
-    // MARK: Methods
-
-    /// Equality of two decapsulation keys
-    ///
-    /// - Parameters:
-    ///   - key1: a decapsulation key
-    ///   - key2: a decapsulation key
-    /// - Returns: *true* if key1 and key2 are equal, *false* otherwise
-    public static func == (key1: DecapsulationKey, key2: DecapsulationKey) -> Bool {
-        return key1.keyBytes == key2.keyBytes
-    }
+    // MARK: Instance Methods
 
     /// The decapsulation function
     ///
@@ -76,6 +65,10 @@ public struct DecapsulationKey: Equatable {
             throw KyberException.cipherTextSize(value: ct.count)
         }
         return self.kyber.KEMDecaps(ct, self.keyBytes)
+    }
+
+    public static func == (key1: DecapsulationKey, key2: DecapsulationKey) -> Bool {
+        return key1.keyBytes == key2.keyBytes
     }
 
 }

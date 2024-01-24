@@ -10,8 +10,13 @@ public struct EncapsulationKey: Equatable {
     
     let kyber: Kyber
 
+    // MARK: Stored Properties
     
-    // MARK: Initializers
+    /// The key bytes
+    public let keyBytes: Bytes
+
+
+    // MARK: Constructors
     
     /// Creates an encapsulation key from its key bytes
     ///
@@ -45,23 +50,7 @@ public struct EncapsulationKey: Equatable {
     }
 
 
-    // MARK: Stored Properties
-    
-    /// The key bytes
-    public let keyBytes: Bytes
-
-    
-    // MARK: Methods
-
-    /// Equality of two encapsulation keys
-    ///
-    /// - Parameters:
-    ///   - key1: an encapsulation key
-    ///   - key2: an encapsulation key
-    /// - Returns: *true* if key1 and key2 are equal, *false* otherwise
-    public static func == (key1: EncapsulationKey, key2: EncapsulationKey) -> Bool {
-        return key1.keyBytes == key2.keyBytes
-    }
+    // MARK: Instance Methods
 
     /// The encapsulation function
     ///
@@ -74,5 +63,9 @@ public struct EncapsulationKey: Equatable {
     func Encapsulate(_ seed: Bytes) -> (K: Bytes, ct: Bytes) {
         return self.kyber.KEMEncaps(seed, self.keyBytes)
     }
-    
+
+    public static func == (key1: EncapsulationKey, key2: EncapsulationKey) -> Bool {
+        return key1.keyBytes == key2.keyBytes
+    }
+
 }
