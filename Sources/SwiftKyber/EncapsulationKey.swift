@@ -54,7 +54,7 @@ public struct EncapsulationKey: Equatable {
 
     /// The encapsulation function
     ///
-    /// - Returns: The shared secret *K* and the ciphertext *ct*
+    /// - Returns: The shared secret `K` and the ciphertext `ct`
     public func Encapsulate() -> (K: Bytes, ct: Bytes) {
         return self.kyber.KEMEncaps([], self.keyBytes)
     }

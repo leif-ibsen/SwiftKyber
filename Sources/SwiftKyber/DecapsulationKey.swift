@@ -59,7 +59,7 @@ public struct DecapsulationKey: Equatable {
     /// - Parameters:
     ///   - ct: The ciphertext
     /// - Returns: The shared secret
-    /// - Throws: A *cipherTextSize* exception if *ct* has wrong size
+    /// - Throws: An exception if the ciphertext has wrong size
     public func Decapsulate(ct: Bytes) throws -> Bytes {
         guard ct.count == self.kyber.ctSize else {
             throw KyberException.cipherTextSize(value: ct.count)

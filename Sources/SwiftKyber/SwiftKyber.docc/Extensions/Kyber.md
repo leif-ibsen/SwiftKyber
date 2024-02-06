@@ -1,5 +1,12 @@
 # ``SwiftKyber/Kyber``
 
+## Overview
+
+The Kyber structure contains three static properties `K512`, `K768` and `K1024`
+corresponding to the three predefined Kyber instances.
+
+There is no public constructor, it is not possible to create other instances.
+
 ## Topics
 
 ### Kyber Instances

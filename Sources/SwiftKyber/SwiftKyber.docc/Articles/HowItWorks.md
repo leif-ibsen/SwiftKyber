@@ -2,14 +2,14 @@
 
 ## 
 
-Suppose Alice and Bob wish to share a secret key they can use as a symmetric encryption key:<br/>
+Suppose Alice and Bob wish to share a secret key they can use as a symmetric encryption key:
 
-* Alice generates a Kyber key pair, *encapKey* and *decapKey*. She sends *encapKey* to Bob
-* Bob runs *encapKey.Encapsulate()* to generate a shared secret *K* and a cipher text *cipher*
-* Bob sends *cipher* to Alice
-* Alice runs *decapKey.Decapsulate(ct: cipher)* to generate the same shared secret *K*
+* Alice generates a Kyber key pair, `encapKey` and `decapKey`. She sends `encapKey` to Bob
+* Bob runs `encapKey.Encapsulate()` to generate a shared secret `K` and a cipher text `cipher`
+* Bob sends `cipher` to Alice
+* Alice runs `decapKey.Decapsulate(ct: cipher)` to generate the same shared secret `K`
 
-### Here is a *Kyber.K512* example:
+### Example
 
 ```swift
 import SwiftKyber

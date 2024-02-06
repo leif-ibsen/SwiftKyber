@@ -13,9 +13,7 @@ public typealias Byte = UInt8
 /// Array of unsigned 8 bit values
 public typealias Bytes = [UInt8]
 
-/// The Kyber structure contains three static properties *K512*, *K768* and *K1024*
-/// corresponding to the three predefined Kyber instances. There is no public constructor,
-/// it is not possible to create other instances.
+/// The Kyber structure
 public struct Kyber {
     
     
@@ -35,7 +33,7 @@ public struct Kyber {
     
     /// Generates an encapsulation key and a decapsulation key
     ///
-    /// - Returns: The encapsulation key *encap* and the decapsulation key *decap*
+    /// - Returns: The encapsulation key `encap` and the decapsulation key `decap`
     public func GenerateKeyPair() -> (encap: EncapsulationKey, decap: DecapsulationKey) {
         let (encap, decap) = KEMKeyGen([])
         do {
