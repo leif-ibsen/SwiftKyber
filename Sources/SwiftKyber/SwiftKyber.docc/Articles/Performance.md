@@ -1,5 +1,7 @@
 # Performance
 
+Execution times for certain SwiftKyber operations
+
 ## 
 
 SwiftKyber's key generation, encapsulation and decapsulation performance was measured on an iMac 2021, Apple M1 chip.

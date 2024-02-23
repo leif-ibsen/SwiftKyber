@@ -10,8 +10,8 @@ Its functionality encompasses:
 
 SwiftKyber contains three Kyber instances: Kyber.K512, Kyber.K768 and Kyber.K1024 corresponding to the three instances defined in FIPS 203.
 
-Its documentation is build with the DocC tool and published on GitHub Pages at this location:
+Its documentation is build with the DocC plugin and published on GitHub Pages at this location:
 
 https://leif-ibsen.github.io/SwiftKyber/documentation/swiftkyber
 
-The documentation is also available in the *SwiftKyber.doccarchive** file.
+The documentation is also available in the *SwiftKyber.doccarchive* file.

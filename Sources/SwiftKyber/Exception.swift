@@ -5,9 +5,7 @@
 //  Created by Leif Ibsen on 19/10/2023.
 //
 
-///
-/// Kyber exceptions
-///
+/// The Kyber exceptions
 public enum KyberException: Error {
     
     /// Wrong encapsulation key size

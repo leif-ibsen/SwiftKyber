@@ -5,7 +5,6 @@
 //  Created by Leif Ibsen on 25/12/2023.
 //
 
-/// The encapsulation key
 public struct EncapsulationKey: Equatable {
     
     let kyber: Kyber
@@ -64,8 +63,24 @@ public struct EncapsulationKey: Equatable {
         return self.kyber.KEMEncaps(seed, self.keyBytes)
     }
 
+    /// Equal
+    ///
+    /// - Parameters:
+    ///   - key1: First operand
+    ///   - key2: Second operand
+    /// - Returns: `true` if key1 = key2, `false` otherwise
     public static func == (key1: EncapsulationKey, key2: EncapsulationKey) -> Bool {
         return key1.keyBytes == key2.keyBytes
+    }
+
+    /// Not equal
+    ///
+    /// - Parameters:
+    ///   - key1: First operand
+    ///   - key2: Second operand
+    /// - Returns: `false` if key1 = key2, `true` otherwise
+    public static func != (key1: EncapsulationKey, key2: EncapsulationKey) -> Bool {
+        return key1.keyBytes != key2.keyBytes
     }
 
 }

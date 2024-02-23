@@ -1,5 +1,7 @@
 # ``SwiftKyber/EncapsulationKey``
 
+The encapsulation key
+
 ## Topics
 
 ### Properties
@@ -10,7 +12,11 @@
 
 - ``init(keyBytes:)``
 
-### Methods
+### Encapsulate
 
 - ``Encapsulate()``
+
+### Equality
+
 - ``==(_:_:)``
+- ``!=(_:_:)``

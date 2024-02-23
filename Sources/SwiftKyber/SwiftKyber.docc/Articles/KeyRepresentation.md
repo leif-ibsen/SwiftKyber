@@ -1,8 +1,8 @@
 # Key Representation
 
-## 
+SwiftKyber keys can be stored as raw bytes and later recreated from the stored bytes
 
-SwiftKyber keys can be stored as raw bytes and later recreated from the stored bytes.
+## 
 
 ### Example
 

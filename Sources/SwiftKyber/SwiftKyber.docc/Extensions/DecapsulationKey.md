@@ -1,5 +1,7 @@
 # ``SwiftKyber/DecapsulationKey``
 
+The decapsulation key
+
 ## Topics
 
 ### Properties
@@ -11,7 +13,11 @@
 
 - ``init(keyBytes:)``
 
-### Methods
+### Decapsulate
 
 - ``Decapsulate(ct:)``
+
+### Equality
+
 - ``==(_:_:)``
+- ``!=(_:_:)``
