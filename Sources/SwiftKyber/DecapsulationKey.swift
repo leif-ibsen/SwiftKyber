@@ -40,10 +40,10 @@ public struct DecapsulationKey: Equatable {
         } else {
             throw KyberException.decapsulationKeySize(value: keyBytes.count)
         }
-        let encapBytes = self.keyBytes.slice(self.kyber.ekSize - 32, self.kyber.ekSize).bytes
+        let encapBytes = Bytes(self.keyBytes[self.kyber.ekSize - 32 ..< self.kyber.ekSize - 32 + self.kyber.ekSize])
         self.encapsulationKey = try EncapsulationKey(keyBytes: encapBytes)
         if check {
-            if Kyber.H(encapBytes) != keyBytes.slice(self.kyber.ekSize * 2 - 32, 32).bytes {
+            if Kyber.H(encapBytes) != Bytes(keyBytes[self.kyber.ekSize * 2 - 32 ..< self.kyber.ekSize * 2]) {
                 throw KyberException.decapsulationKeyInconsistent
             }
         }

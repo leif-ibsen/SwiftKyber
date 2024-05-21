@@ -314,9 +314,9 @@ public struct Kyber {
     func PKEDecrypt(_ dk: Bytes, _ ct: Bytes) -> Bytes {
         assert(dk.count == self.k384)
         assert(ct.count == (self.du * self.k + self.dv) * 32)
-        let index = self.du * self.k << 5
-        let u = Vector.ByteDecode(ct.slice(0, index).bytes, self.du).Decompress(self.du)
-        let v = Polynomial.ByteDecode(ct.slice(index, self.dv << 5).bytes, self.dv).Decompress(self.dv)
+        var ctSlice = ct.sliced()
+        let u = Vector.ByteDecode(ctSlice.next(self.du * self.k << 5), self.du).Decompress(self.du)
+        let v = Polynomial.ByteDecode(ctSlice.next(self.dv << 5), self.dv).Decompress(self.dv)
         let sHat = Vector.ByteDecode(dk, 12)
         let w = v - (sHat * u.NTT()).INTT()
         return w.Compress(1).ByteEncode(1)
@@ -331,8 +331,8 @@ public struct Kyber {
             s1 = []
             Kyber.randomBytes(&z)
         } else {
-            s1 = seed.slice(0, 32).bytes
-            z = seed.slice(32, 32).bytes
+            s1 = Bytes(seed[0 ..<  32])
+            z = Bytes(seed[32 ..< 64])
         }
         let (ek, dk) = PKEKeyGen(s1)
         return (ek, dk + ek + Kyber.H(ek) + z)
@@ -357,10 +357,11 @@ public struct Kyber {
     func KEMDecaps(_ ct: Bytes, _ dk: Bytes) -> Bytes {
         assert(ct.count == (self.du * self.k + self.dv) * 32)
         assert(dk.count == self.k768 + 96)
-        let dkPKE = dk.slice(0, self.k384).bytes
-        let ekPKE = dk.slice(self.k384, self.k384 + 32).bytes
-        let h = dk.slice(self.k768 + 32, 32).bytes
-        let z = dk.slice(self.k768 + 64, 32).bytes
+        var dkSlice = dk.sliced()
+        let dkPKE = dkSlice.next(self.k384)
+        let ekPKE = dkSlice.next(self.k384 + 32)
+        let h = dkSlice.next(32)
+        let z = dkSlice.next(32)
         let m = PKEDecrypt(dkPKE, ct)
         let (K, r) = Kyber.G(m + h)
         let K_ = Kyber.J(z + ct)

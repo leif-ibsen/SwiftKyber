@@ -38,12 +38,12 @@ public struct EncapsulationKey: Equatable {
             throw KyberException.encapsulationKeySize(value: keyBytes.count)
         }
         if check {
-            var x = self.keyBytes.slice(0, 384)
+            var x = self.keyBytes.sliced()
             for _ in 0 ..< self.kyber.k {
-                if x.bytes != Kyber.ByteEncode(Kyber.ByteDecode(x.bytes, 12), 12) {
+                let xb = x.next(384)
+                if xb != Kyber.ByteEncode(Kyber.ByteDecode(xb, 12), 12) {
                     throw KyberException.encapsulationKeyInconsistent
                 }
-                x.next()
             }
         }
     }

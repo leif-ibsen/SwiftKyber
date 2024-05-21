@@ -51,7 +51,7 @@ To use SwiftKyber, in your project *Package.swift* file add a dependency like
 
 ```swift
 dependencies: [
-  .package(url: "https://github.com/leif-ibsen/SwiftKyber", from: "2.3.0"),
+  .package(url: "https://github.com/leif-ibsen/SwiftKyber", from: "2.4.0"),
 ]
 ```
 
@@ -59,7 +59,7 @@ SwiftKyber itself depends on the Digest package
 
 ```swift
 dependencies: [
-  .package(url: "https://github.com/leif-ibsen/Digest", from: "1.3.0"),
+  .package(url: "https://github.com/leif-ibsen/Digest", from: "1.6.0"),
 ],
 ```
 

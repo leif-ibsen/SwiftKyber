@@ -10,7 +10,7 @@ import XCTest
 
 final class KAT768Test: XCTestCase {
 
-    // Test vectors from GitHub: Krzystof Kwiatkowski
+    // Test vectors from https://github.com/post-quantum-cryptography/KAT
 
     override func setUpWithError() throws {
         let url = Bundle.module.url(forResource: "kat768", withExtension: "rsp")!
@@ -18,7 +18,7 @@ final class KAT768Test: XCTestCase {
     }
 
     var katTests: [Util.katTest] = []
-
+    
     func test() throws {
         for t in katTests {
             let (ek, dk) = Kyber.K768.KEMKeyGen(t.d + t.z)
@@ -26,10 +26,11 @@ final class KAT768Test: XCTestCase {
             XCTAssertEqual(dk, t.sk)
             let EK = try EncapsulationKey(keyBytes: ek)
             let DK = try DecapsulationKey(keyBytes: dk)
-            let (ss, ct) = EK.Encapsulate(t.m)
+            let (ss, ct) = EK.Encapsulate(t.msg)
             XCTAssertEqual(ss, t.ss)
             XCTAssertEqual(ct, t.ct)
             XCTAssertEqual(try DK.Decapsulate(ct: ct), ss)
+            XCTAssertEqual(try DK.Decapsulate(ct: t.ct_n), t.ss_n)
         }
     }
 
