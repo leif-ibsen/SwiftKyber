@@ -10,16 +10,10 @@ import XCTest
 
 final class NTTTest: XCTestCase {
 
-    func randomInts(_ ints: inout [Int]) {
-        guard SecRandomCopyBytes(kSecRandomDefault, 8 * ints.count, &ints) == errSecSuccess else {
-            fatalError("randomInts failed")
-        }
-    }
-
     func test1() throws {
         var x = [Int](repeating: 0, count: 256)
         for _ in 0 ..< 100 {
-            randomInts(&x)
+            Util.randomInts(&x)
             for i in 0 ..< 256 {
                 x[i] = abs(x[i]) % Kyber.Q
             }
@@ -34,7 +28,7 @@ final class NTTTest: XCTestCase {
     func test2() throws {
         var x = [Int](repeating: 0, count: 256)
         for _ in 0 ..< 100 {
-            randomInts(&x)
+            Util.randomInts(&x)
             for i in 0 ..< 256 {
                 x[i] = abs(x[i]) % Kyber.Q
             }

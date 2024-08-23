@@ -19,9 +19,15 @@ final class KeysTest: XCTestCase {
         XCTAssertEqual(dk, newDk)
     }
 
-    func test() throws {
+    func test512() throws {
         try doTest(Kyber.K512)
+    }
+
+    func test768() throws {
         try doTest(Kyber.K768)
+    }
+
+    func test1024() throws {
         try doTest(Kyber.K1024)
     }
 

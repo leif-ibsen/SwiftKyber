@@ -8,12 +8,22 @@
 // Vector of vector of polynomials
 struct Matrix: Equatable {
     
-    var vector: [Vector]
+    var vectors: [Vector]
     let n: Int
     
     init(_ n: Int) {
-        self.vector = [Vector](repeating: Vector(n), count: n)
+        self.vectors = [Vector](repeating: Vector(n), count: n)
         self.n = n
+    }
+    
+    mutating func transpose() {
+        for i in 1 ..< self.n {
+            for j in 0 ..< i {
+                let x = self.vectors[i].polynomials[j]
+                self.vectors[i].polynomials[j] = self.vectors[j].polynomials[i]
+                self.vectors[j].polynomials[i] = x
+            }
+        }
     }
     
     // m o v
@@ -22,7 +32,7 @@ struct Matrix: Equatable {
         var x = Vector(m.n)
         for i in 0 ..< m.n {
             for j in 0 ..< m.n {
-                x.polynomial[i] += m.vector[i].polynomial[j] * v.polynomial[j]
+                x.polynomials[i] += m.vectors[i].polynomials[j] * v.polynomials[j]
             }
         }
         return x

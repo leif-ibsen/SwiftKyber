@@ -6,7 +6,7 @@ Execution times for certain SwiftKyber operations
 
 SwiftKyber's key generation, encapsulation and decapsulation performance was measured on an iMac 2021, Apple M1 chip.
 
-The table below shows the times in milli seconds for the three Kyber instances.
+The table below shows the times in milliseconds for the three Kyber instances.
 
 | Instance    | GenerateKeyPair | Encapsulate | Decapsulate |
 |:------------|----------------:|------------:|------------:|

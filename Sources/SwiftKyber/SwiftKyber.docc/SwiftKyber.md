@@ -1,10 +1,10 @@
 # ``SwiftKyber``
 
-Module-Lattice-based Key-Encapsulation Mechanism Standard
+Module-Lattice-Based Key-Encapsulation Mechanism Standard
 
 ## Overview
 
-SwiftKyber is a Swift implementation of NIST FIPS 203 (Draft): *Module-Lattice-based Key-Encapsulation Mechanism Standard, August 2023*.
+SwiftKyber is a Swift implementation of NIST FIPS 203: *Module-Lattice-Based Key-Encapsulation Mechanism Standard, August 13, 2024*.
 
 SwiftKyber contains three Kyber instances: `Kyber.K512`, `Kyber.K768` and `Kyber.K1024` corresponding to the three instances defined in [FIPS 203].
 
@@ -51,7 +51,7 @@ To use SwiftKyber, in your project *Package.swift* file add a dependency like
 
 ```swift
 dependencies: [
-  .package(url: "https://github.com/leif-ibsen/SwiftKyber", from: "2.4.0"),
+  .package(url: "https://github.com/leif-ibsen/SwiftKyber", from: "2.5.0"),
 ]
 ```
 

@@ -32,21 +32,21 @@ struct Polynomial: Equatable {
         1722, 1607, 1212, 2117, 1874, 1455, 1029, 2300, 2110, 1219, 2935,  394,  885, 2444, 2154, 1175
     ]
     
-    var coefficient: [Int]
+    var coefficients: [Int]
     
     init() {
-        self.coefficient = [Int](repeating: 0, count: 256)
+        self.coefficients = [Int](repeating: 0, count: 256)
     }
     
-    init(_ coefficient: [Int]) {
-        assert(coefficient.count == 256)
-        self.coefficient = coefficient
+    init(_ coefficients: [Int]) {
+        assert(coefficients.count == 256)
+        self.coefficients = coefficients
     }
     
     func Compress(_ d: Int) -> Polynomial {
         var x = Polynomial()
         for i in 0 ..< 256 {
-            x.coefficient[i] = Kyber.Compress(self.coefficient[i], d)
+            x.coefficients[i] = Kyber.Compress(self.coefficients[i], d)
         }
         return x
     }
@@ -54,25 +54,25 @@ struct Polynomial: Equatable {
     func Decompress(_ d: Int) -> Polynomial {
         var x = Polynomial()
         for i in 0 ..< 256 {
-            x.coefficient[i] = Kyber.Decompress(self.coefficient[i], d)
+            x.coefficients[i] = Kyber.Decompress(self.coefficients[i], d)
         }
         return x
     }
     
     func ByteEncode(_ d: Int) -> Bytes {
         assert(0 < d && d <= 12)
-        return Kyber.ByteEncode(self.coefficient, d)
+        return Kyber.ByteEncode(self.coefficients, d)
     }
 
     static func ByteDecode(_ bytes: Bytes, _ d: Int) -> Polynomial {
-        assert(bytes.count == d << 5)
+        assert(bytes.count == d * 32)
         return Polynomial(Kyber.ByteDecode(bytes, d))
     }
 
     // Number Theoretic Transform
-    // [FIPS203] - Algorithm 8
+    // [FIPS203] - Algorithm 9
     func NTT() -> Polynomial {
-        var f = self.coefficient
+        var f = self.coefficients
         var k = 1
         var len = 128
         while len >= 2 {
@@ -93,9 +93,9 @@ struct Polynomial: Equatable {
     }
 
     // Inverse Number Theoretic Transform
-    // [FIPS203] - Algorithm 9
+    // [FIPS203] - Algorithm 10
     func INTT() -> Polynomial {
-        var f = self.coefficient
+        var f = self.coefficients
         var k = 127
         var len = 2
         while len <= 128 {
@@ -119,35 +119,35 @@ struct Polynomial: Equatable {
     }
 
     // f * g
-    // [FIPS203] - Algorithm 10
+    // [FIPS203] - Algorithm 11
     static func *(_ f: Polynomial, _ g: Polynomial) -> Polynomial {
         var h = [Int](repeating: 0, count: 256)
         for i in stride(from: 0, to: 256, by: 2) {
-            let x1 = f.coefficient[i]
-            let x2 = f.coefficient[i + 1]
-            let y1 = g.coefficient[i]
-            let y2 = g.coefficient[i + 1]
+            let x1 = f.coefficients[i]
+            let x2 = f.coefficients[i + 1]
+            let y1 = g.coefficients[i]
+            let y2 = g.coefficients[i + 1]
             let z = zetas2[i >> 1]
             h[i] = Kyber.addModQ(Kyber.reduceModQ(x1 * y1), Kyber.reduceModQ(z * Kyber.reduceModQ(x2 * y2)))
             h[i + 1] = Kyber.addModQ(Kyber.reduceModQ(x2 * y1), Kyber.reduceModQ(x1 * y2))
         }
         return Polynomial(h)
     }
-    
+
     // p1 + p2
     static func +(_ p1: Polynomial, _ p2: Polynomial) -> Polynomial {
         var sum = p1
         sum += p2
         return sum
     }
-    
+
     // p1 += p2
     static func +=(_ p1: inout Polynomial, _ p2: Polynomial) {
         for i in 0 ..< 256 {
-            p1.coefficient[i] = Kyber.addModQ(p1.coefficient[i], p2.coefficient[i])
+            p1.coefficients[i] = Kyber.addModQ(p1.coefficients[i], p2.coefficients[i])
         }
     }
-    
+
     // p1 - p2
     static func -(_ p1: Polynomial, _ p2: Polynomial) -> Polynomial {
         var diff = p1
@@ -158,7 +158,7 @@ struct Polynomial: Equatable {
     // p1 -= p2
     static func -=(_ p1: inout Polynomial, _ p2: Polynomial) {
         for i in 0 ..< 256 {
-            p1.coefficient[i] = Kyber.subModQ(p1.coefficient[i], p2.coefficient[i])
+            p1.coefficients[i] = Kyber.subModQ(p1.coefficients[i], p2.coefficients[i])
         }
     }
     

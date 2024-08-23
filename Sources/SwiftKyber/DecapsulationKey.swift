@@ -26,10 +26,6 @@ public struct DecapsulationKey: Equatable {
     ///   - keyBytes: The key bytes
     /// - Throws: An exception if the key bytes has wrong size or are inconsistent
     public init(keyBytes: Bytes) throws {
-        try self.init(keyBytes, true)
-    }
-
-    init(_ keyBytes: Bytes, _ check: Bool) throws {
         self.keyBytes = keyBytes
         if keyBytes.count == Kyber.K512.dkSize {
             self.kyber = Kyber.K512
@@ -40,13 +36,11 @@ public struct DecapsulationKey: Equatable {
         } else {
             throw KyberException.decapsulationKeySize(value: keyBytes.count)
         }
-        let encapBytes = Bytes(self.keyBytes[self.kyber.ekSize - 32 ..< self.kyber.ekSize - 32 + self.kyber.ekSize])
-        self.encapsulationKey = try EncapsulationKey(keyBytes: encapBytes)
-        if check {
-            if Kyber.H(encapBytes) != Bytes(keyBytes[self.kyber.ekSize * 2 - 32 ..< self.kyber.ekSize * 2]) {
-                throw KyberException.decapsulationKeyInconsistent
-            }
+        let encapBytes = Bytes(self.keyBytes[self.kyber.k384 ..< self.kyber.k768 + 32])
+        if Kyber.H(encapBytes) != Bytes(keyBytes[self.kyber.k768 + 32 ..< self.kyber.k768 + 64]) {
+            throw KyberException.decapsulationKeyInconsistent
         }
+        self.encapsulationKey = try EncapsulationKey(keyBytes: encapBytes)
     }
 
 
@@ -62,7 +56,7 @@ public struct DecapsulationKey: Equatable {
         guard ct.count == self.kyber.ctSize else {
             throw KyberException.cipherTextSize(value: ct.count)
         }
-        return self.kyber.KEMDecaps(ct, self.keyBytes)
+        return self.kyber.ML_KEMDecaps(self.keyBytes, ct)
     }
 
     /// Equal

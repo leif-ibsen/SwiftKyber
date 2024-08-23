@@ -23,10 +23,6 @@ public struct EncapsulationKey: Equatable {
     ///   - keyBytes: The key bytes
     /// - Throws: An exception if the key bytes has wrong size or are inconsistent
     public init(keyBytes: Bytes) throws {
-        try self.init(keyBytes, true)
-    }
-
-    init(_ keyBytes: Bytes, _ check: Bool) throws {
         self.keyBytes = keyBytes
         if keyBytes.count == Kyber.K512.ekSize {
             self.kyber = Kyber.K512
@@ -37,13 +33,10 @@ public struct EncapsulationKey: Equatable {
         } else {
             throw KyberException.encapsulationKeySize(value: keyBytes.count)
         }
-        if check {
-            var x = self.keyBytes.sliced()
-            for _ in 0 ..< self.kyber.k {
-                let xb = x.next(384)
-                if xb != Kyber.ByteEncode(Kyber.ByteDecode(xb, 12), 12) {
-                    throw KyberException.encapsulationKeyInconsistent
-                }
+        for i in 0 ..< self.kyber.k {
+            let ekBytes = Bytes(keyBytes[i * 384 ..< (i + 1) * 384])
+            if ekBytes != Kyber.ByteEncode(Kyber.ByteDecode(ekBytes, 12), 12) {
+                throw KyberException.encapsulationKeyInconsistent
             }
         }
     }
@@ -55,12 +48,7 @@ public struct EncapsulationKey: Equatable {
     ///
     /// - Returns: The shared secret `K` and the ciphertext `ct`
     public func Encapsulate() -> (K: Bytes, ct: Bytes) {
-        return self.kyber.KEMEncaps([], self.keyBytes)
-    }
-
-    // Only used from the KAT test cases
-    func Encapsulate(_ seed: Bytes) -> (K: Bytes, ct: Bytes) {
-        return self.kyber.KEMEncaps(seed, self.keyBytes)
+        return self.kyber.ML_KEMEncaps(self.keyBytes)
     }
 
     /// Equal

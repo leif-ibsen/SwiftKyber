@@ -8,18 +8,18 @@
 // Vector of polynomials
 struct Vector: Equatable {
     
-    var polynomial: [Polynomial]
+    var polynomials: [Polynomial]
     let n: Int
     
     init(_ n: Int) {
-        self.polynomial = [Polynomial](repeating: Polynomial(), count: n)
+        self.polynomials = [Polynomial](repeating: Polynomial(), count: n)
         self.n = n
     }
     
     func Compress(_ d: Int) -> Vector {
         var x = Vector(self.n)
         for i in 0 ..< x.n {
-            x.polynomial[i] = self.polynomial[i].Compress(d)
+            x.polynomials[i] = self.polynomials[i].Compress(d)
         }
         return x
     }
@@ -27,7 +27,7 @@ struct Vector: Equatable {
     func Decompress(_ d: Int) -> Vector {
         var x = Vector(self.n)
         for i in 0 ..< x.n {
-            x.polynomial[i] = self.polynomial[i].Decompress(d)
+            x.polynomials[i] = self.polynomials[i].Decompress(d)
         }
         return x
     }
@@ -36,7 +36,7 @@ struct Vector: Equatable {
         assert(0 < d && d <= 12)
         var x: Bytes = []
         for i in 0 ..< self.n {
-            x += self.polynomial[i].ByteEncode(d)
+            x += self.polynomials[i].ByteEncode(d)
         }
         return x
     }
@@ -47,7 +47,7 @@ struct Vector: Equatable {
         var v = Vector(n)
         var from = 0
         for i in 0 ..< n {
-            v.polynomial[i] = Polynomial(Kyber.ByteDecode(Bytes(x[from ..< from + step]), d))
+            v.polynomials[i] = Polynomial(Kyber.ByteDecode(Bytes(x[from ..< from + step]), d))
             from += step
         }
         return v
@@ -57,7 +57,7 @@ struct Vector: Equatable {
     func NTT() -> Vector {
         var v = Vector(self.n)
         for i in 0 ..< self.n {
-            v.polynomial[i] = self.polynomial[i].NTT()
+            v.polynomials[i] = self.polynomials[i].NTT()
         }
         return v
     }
@@ -66,7 +66,7 @@ struct Vector: Equatable {
     func INTT() -> Vector {
         var v = Vector(self.n)
         for i in 0 ..< self.n {
-            v.polynomial[i] = self.polynomial[i].INTT()
+            v.polynomials[i] = self.polynomials[i].INTT()
         }
         return v
     }
@@ -76,7 +76,7 @@ struct Vector: Equatable {
         assert(v1.n == v2.n)
         var sum = Vector(v1.n)
         for i in 0 ..< sum.n {
-            sum.polynomial[i] = v1.polynomial[i] + v2.polynomial[i]
+            sum.polynomials[i] = v1.polynomials[i] + v2.polynomials[i]
         }
         return sum
     }
@@ -86,7 +86,7 @@ struct Vector: Equatable {
         assert(v1.n == v2.n)
         var pol = Polynomial()
         for i in 0 ..< v1.n {
-            pol += v1.polynomial[i] * v2.polynomial[i]
+            pol += v1.polynomials[i] * v2.polynomials[i]
         }
         return pol
     }

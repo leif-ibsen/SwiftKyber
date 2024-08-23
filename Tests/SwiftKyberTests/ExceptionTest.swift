@@ -43,8 +43,7 @@ final class ExceptionTest: XCTestCase {
 
     func test4() throws {
         do {
-            let keyBytes = Bytes(repeating: 255, count: Kyber.K512.ekSize)
-            let _ = try EncapsulationKey(keyBytes: keyBytes)
+            let _ = try EncapsulationKey(keyBytes: Bytes(repeating: 255, count: Kyber.K512.ekSize))
             XCTFail("Expected encapsulationKeyInconsistent exception")
         } catch KyberException.encapsulationKeyInconsistent {
         } catch {
@@ -55,11 +54,9 @@ final class ExceptionTest: XCTestCase {
     func test5() throws {
         do {
             let (_, dk) = Kyber.K512.GenerateKeyPair()
-            var bytes = dk.keyBytes
-            for i in 0 ..< 32 {
-                bytes[Kyber.K512.ekSize * 2 - 32 + i] = 0
-            }
-            let _ = try DecapsulationKey(keyBytes: bytes)
+            var kb = dk.keyBytes
+            kb[Kyber.K512.k768 + 32] &+= 1
+            let _ = try DecapsulationKey(keyBytes: kb)
             XCTFail("Expected decapsulationKeyInconsistent exception")
         } catch KyberException.decapsulationKeyInconsistent {
         } catch {

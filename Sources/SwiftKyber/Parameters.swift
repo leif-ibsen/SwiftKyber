@@ -18,7 +18,7 @@ struct KyberParameters {
     let dkSize: Int
     let ctSize: Int
 
-    // Figures from [FIPS203] section 7
+    // Figures from [FIPS203] section 8
 
     // K512 parameters
     static let k512 =  KyberParameters(k: 2, eta1: 3, eta2: 2, du: 10, dv: 4, ekSize:  800, dkSize: 1632, ctSize: 768)
