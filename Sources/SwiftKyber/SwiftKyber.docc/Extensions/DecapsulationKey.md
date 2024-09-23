@@ -8,10 +8,14 @@ The decapsulation key
 
 - ``keyBytes``
 - ``encapsulationKey``
+- ``asn1``
+- ``pem``
+- ``description``
 
-### Constructor
+### Constructors
 
 - ``init(keyBytes:)``
+- ``init(pem:)``
 
 ### Decapsulate
 

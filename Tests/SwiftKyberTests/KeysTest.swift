@@ -10,8 +10,8 @@ import XCTest
 
 final class KeysTest: XCTestCase {
 
-    func doTest(_ kyber: Kyber) throws {
-        let (ek, dk) = kyber.GenerateKeyPair()
+    func doTest(_ kind: Kind) throws {
+        let (ek, dk) = Kyber.GenerateKeyPair(kind: kind)
         XCTAssertEqual(ek.keyBytes, dk.encapsulationKey.keyBytes)
         let newEk = try EncapsulationKey(keyBytes: ek.keyBytes)
         let newDk = try DecapsulationKey(keyBytes: dk.keyBytes)
@@ -20,15 +20,15 @@ final class KeysTest: XCTestCase {
     }
 
     func test512() throws {
-        try doTest(Kyber.K512)
+        try doTest(.K512)
     }
 
     func test768() throws {
-        try doTest(Kyber.K768)
+        try doTest(.K768)
     }
 
     func test1024() throws {
-        try doTest(Kyber.K1024)
+        try doTest(.K1024)
     }
 
 }

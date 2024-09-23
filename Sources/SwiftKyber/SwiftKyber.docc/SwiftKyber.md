@@ -6,44 +6,12 @@ Module-Lattice-Based Key-Encapsulation Mechanism Standard
 
 SwiftKyber is a Swift implementation of NIST FIPS 203: *Module-Lattice-Based Key-Encapsulation Mechanism Standard, August 13, 2024*.
 
-SwiftKyber contains three Kyber instances: `Kyber.K512`, `Kyber.K768` and `Kyber.K1024` corresponding to the three instances defined in [FIPS 203].
+SwiftKyber functionality:
 
-Its functionality encompasses:
-
+* Support for the three Kyber kinds defined in [FIPS 203]
 * Generation of key pairs
 * A key encapsulation function
 * A key decapsulation function
-
-### How it Works
-
-Suppose Alice and Bob wish to share a secret key they can use as a symmetric encryption key:
-
-* Alice generates a Kyber key pair, `encapKey` and `decapKey`. She sends `encapKey` to Bob
-* Bob runs `encapKey.Encapsulate()` to generate a shared secret `K` and a cipher text `cipher`
-* Bob sends `cipher` to Alice
-* Alice runs `decapKey.Decapsulate(ct: cipher)` to generate the same shared secret `K`
-
-### Example
-
-```swift
-import SwiftKyber
-
-// Alice:
-let (encapKey, decapKey) = Kyber.K512.GenerateKeyPair()
-
-// Bob:
-let (K1, cipher) = encapKey.Encapsulate()
-print("Bob's K:  ", K1)
-    
-// Alice:
-let K2 = try decapKey.Decapsulate(ct: cipher)
-print("Alice's K:", K2)
-```
-giving (for example):
-```swift
-Bob's K:   [106, 169, 16, 187, 123, 157, 206, 223, 236, 143, 173, 180, 243, 130, 157, 122, 150, 68, 167, 31, 33, 246, 28, 150, 215, 182, 71, 72, 128, 37, 202, 17]
-Alice's K: [106, 169, 16, 187, 123, 157, 206, 223, 236, 143, 173, 180, 243, 130, 157, 122, 150, 68, 167, 31, 33, 246, 28, 150, 215, 182, 71, 72, 128, 37, 202, 17]
-```
 
 ### Usage
 
@@ -51,17 +19,21 @@ To use SwiftKyber, in your project *Package.swift* file add a dependency like
 
 ```swift
 dependencies: [
-  .package(url: "https://github.com/leif-ibsen/SwiftKyber", from: "2.5.0"),
+  .package(url: "https://github.com/leif-ibsen/SwiftKyber", from: "3.0.0"),
 ]
 ```
 
-SwiftKyber itself depends on the Digest package
+SwiftKyber itself depends on the [ASN1](https://leif-ibsen.github.io/ASN1/documentation/asn1), [BigInt](https://leif-ibsen.github.io/BigInt/documentation/bigint) and [Digest](https://leif-ibsen.github.io/Digest/documentation/digest) packages
 
 ```swift
 dependencies: [
-  .package(url: "https://github.com/leif-ibsen/Digest", from: "1.6.0"),
+  .package(url: "https://github.com/leif-ibsen/ASN1", from: "2.6.0"),
+  .package(url: "https://github.com/leif-ibsen/BigInt", from: "1.19.0"),
+  .package(url: "https://github.com/leif-ibsen/Digest", from: "1.8.0"),
 ],
 ```
+
+SwiftKyber doesn't do big integer arithmetic, but the ASN1 package depends on the BigInt package.
 
 > Important:
 SwiftKyber requires Swift 5.0. It also requires that the `Int` and `UInt` types be 64 bit types.
@@ -81,10 +53,13 @@ SwiftKyber requires Swift 5.0. It also requires that the `Int` and `UInt` types 
 
 ### Enumerations
 
-- ``SwiftKyber/KyberException``
+- ``SwiftKyber/Kind``
+- ``SwiftKyber/Exception``
 
 ### Additional Information
 
-- <doc:KeyRepresentation>
+- <doc:HowItWorks>
+- <doc:KeyManagement>
+- <doc:OIDs>
 - <doc:Performance>
 - <doc:References>

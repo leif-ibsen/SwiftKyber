@@ -4,19 +4,11 @@ The Kyber structure
 
 ## Overview
 
-The Kyber structure contains three static properties `K512`, `K768` and `K1024`
-corresponding to the three predefined Kyber instances.
-
-There is no public constructor, it is not possible to create other instances.
+The Kyber structure exists to provide a namespace. It contains a static method for key generation.
+It is not possible to create Kyber instances.
 
 ## Topics
 
-### Kyber Instances
-
-- ``K512``
-- ``K768``
-- ``K1024``
-
 ### Generate Keys
 
-- ``GenerateKeyPair()``
+- ``GenerateKeyPair(kind:)``

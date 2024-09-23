@@ -5,42 +5,95 @@
 //  Created by Leif Ibsen on 25/12/2023.
 //
 
-public struct DecapsulationKey: Equatable {
+import ASN1
+import Digest
+
+public struct DecapsulationKey: Equatable, CustomStringConvertible {
     
     let kyber: Kyber
-    
+
     // MARK: Stored Properties
     
     /// The key bytes
-    public let keyBytes: Bytes
-    
+    public internal(set) var keyBytes: Bytes
     /// The corresponding encapsulation key
-    public let encapsulationKey: EncapsulationKey
-    
+    public internal(set) var encapsulationKey: EncapsulationKey
+    /// The ASN1 encoding of `self`
+    public var asn1: ASN1 { get { return ASN1Sequence().add(ASN1.ZERO).add(ASN1Sequence().add(self.kyber.oid)).add(ASN1OctetString(ASN1OctetString(self.keyBytes).encode())) } }
+    /// The PEM encoding of `self.asn1`
+    public var pem: String { get { return Base64.pemEncode(self.asn1.encode(), "PRIVATE KEY") } }
+    /// A textual representation of the ASN1 encoding of `self`
+    public var description: String { get { return self.asn1.description } }
+
 
     // MARK: Constructors
     
+    init(_ keyBytes: Bytes, _ kyber: Kyber) throws {
+        self.keyBytes = keyBytes
+        self.kyber = kyber
+        let encapBytes = Bytes(self.keyBytes[self.kyber.kx384 ..< self.kyber.kx768 + 32])
+        if Kyber.H(encapBytes) != Bytes(keyBytes[self.kyber.kx768 + 32 ..< self.kyber.kx768 + 64]) {
+            throw Exception.decapsulationKeyInconsistent
+        }
+        self.encapsulationKey = try EncapsulationKey(keyBytes: encapBytes)
+    }
+
     /// Creates a decapsulation key from its key bytes
     ///
     /// - Parameters:
     ///   - keyBytes: The key bytes
     /// - Throws: An exception if the key bytes has wrong size or are inconsistent
     public init(keyBytes: Bytes) throws {
-        self.keyBytes = keyBytes
-        if keyBytes.count == Kyber.K512.dkSize {
-            self.kyber = Kyber.K512
-        } else if keyBytes.count == Kyber.K768.dkSize {
-            self.kyber = Kyber.K768
-        } else if keyBytes.count == Kyber.K1024.dkSize {
-            self.kyber = Kyber.K1024
-        } else {
-            throw KyberException.decapsulationKeySize(value: keyBytes.count)
+        for kind in Kind.allCases {
+            if keyBytes.count == Parameters.paramsFromKind(kind).dkSize {
+                try self.init(keyBytes, Kyber(kind))
+                return
+            }
         }
-        let encapBytes = Bytes(self.keyBytes[self.kyber.k384 ..< self.kyber.k768 + 32])
-        if Kyber.H(encapBytes) != Bytes(keyBytes[self.kyber.k768 + 32 ..< self.kyber.k768 + 64]) {
-            throw KyberException.decapsulationKeyInconsistent
+        throw Exception.decapsulationKeySize(value: keyBytes.count)
+    }
+
+    /// Creates a decapsulation key from its PEM encoding
+    ///
+    /// - Parameters:
+    ///   - pem: The decapsulation key PEM encoding
+    /// - Throws: An exception if the PEM encoding is wrong
+    public init(pem: String) throws {
+        guard let der = Base64.pemDecode(pem, "PRIVATE KEY") else {
+            throw Exception.pemStructure
         }
-        self.encapsulationKey = try EncapsulationKey(keyBytes: encapBytes)
+        let asn1 = try ASN1.build(der)
+        guard let seq = asn1 as? ASN1Sequence else {
+            throw Exception.asn1Structure
+        }
+        if seq.getValue().count < 3 {
+            throw Exception.asn1Structure
+        }
+        guard let int = seq.get(0) as? ASN1Integer else {
+            throw Exception.asn1Structure
+        }
+        if int != ASN1.ZERO {
+            throw Exception.asn1Structure
+        }
+        guard let seq1 = seq.get(1) as? ASN1Sequence else {
+            throw Exception.asn1Structure
+        }
+        guard let octets = seq.get(2) as? ASN1OctetString else {
+            throw Exception.asn1Structure
+        }
+        if seq1.getValue().count < 1 {
+            throw Exception.asn1Structure
+        }
+        guard let oid = seq1.get(0) as? ASN1ObjectIdentifier else {
+            throw Exception.asn1Structure
+        }
+        guard let kind = Parameters.kindFromOID(oid) else {
+            throw Exception.asn1Structure
+        }
+        guard let seq2 = try ASN1.build(octets.value) as? ASN1OctetString else {
+            throw Exception.asn1Structure
+        }
+        try self.init(seq2.value, Kyber(kind))
     }
 
 
@@ -54,7 +107,7 @@ public struct DecapsulationKey: Equatable {
     /// - Throws: An exception if the ciphertext has wrong size
     public func Decapsulate(ct: Bytes) throws -> Bytes {
         guard ct.count == self.kyber.ctSize else {
-            throw KyberException.cipherTextSize(value: ct.count)
+            throw Exception.cipherTextSize(value: ct.count)
         }
         return self.kyber.ML_KEMDecaps(self.keyBytes, ct)
     }

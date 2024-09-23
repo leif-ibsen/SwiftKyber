@@ -23,19 +23,21 @@ final class KAT512Test: XCTestCase {
     var encapDecapTests: [Util.encapDecapTest] = []
 
     func testKeyGen() throws {
+        let kyber = Kyber(Kind.K512)
         for t in keyGenTests {
-            let (ek, dk) = Kyber.K512.ML_KEMKeyGen_internal(t.d, t.z)
+            let (ek, dk) = kyber.ML_KEMKeyGen_internal(t.d, t.z)
             XCTAssertEqual(ek, t.ek)
             XCTAssertEqual(dk, t.dk)
         }
     }
 
     func testEncapDecap() throws {
+        let kyber = Kyber(Kind.K512)
         for t in encapDecapTests {
-            let (k1, c) = Kyber.K512.ML_KEMEncaps_internal(t.ek, t.m)
+            let (k1, c) = kyber.ML_KEMEncaps_internal(t.ek, t.m)
             XCTAssertEqual(k1, t.k)
             XCTAssertEqual(c, t.c)
-            let k2 = Kyber.K512.ML_KEMDecaps_internal(t.dk, t.c)
+            let k2 = kyber.ML_KEMDecaps_internal(t.dk, t.c)
             XCTAssertEqual(k2, t.k)
         }
     }

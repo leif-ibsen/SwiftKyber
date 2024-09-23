@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import ASN1
 import Digest
 
 /// Unsigned 8 bit value
@@ -16,28 +17,19 @@ public typealias Bytes = [UInt8]
 
 public struct Kyber {
     
-    
-    // MARK: Kyber Instances
-    
-    /// The K512 instance
-    public static let K512 = Kyber(KyberParameters.k512)
 
-    /// The K768 instance
-    public static let K768 = Kyber(KyberParameters.k768)
+    // MARK: Static Methods
 
-    /// The K1024 instance
-    public static let K1024 = Kyber(KyberParameters.k1024)
-
-
-    // MARK: Instance Methods
-    
     /// Generates an encapsulation key and a decapsulation key
     ///
+    /// - Parameters:
+    ///   - kind: The Kyber kind
     /// - Returns: The encapsulation key `encap` and the decapsulation key `decap`
-    public func GenerateKeyPair() -> (encap: EncapsulationKey, decap: DecapsulationKey) {
-        let (encap, decap) = ML_KEMKeyGen()
+    public static func GenerateKeyPair(kind: Kind) -> (encap: EncapsulationKey, decap: DecapsulationKey) {
         do {
-            return (try EncapsulationKey(keyBytes: encap), try DecapsulationKey(keyBytes: decap))
+            let kyber = Kyber(kind)
+            let (encap, decap) = kyber.ML_KEMKeyGen()
+            return (try EncapsulationKey(encap, kyber), try DecapsulationKey(decap, kyber))
         } catch {
             // Shouldn't happen
             fatalError("GenerateKeyPair inconsistency")
@@ -68,20 +60,23 @@ public struct Kyber {
     let ekSize: Int
     let dkSize: Int
     let ctSize: Int
-    let k384: Int
-    let k768: Int
+    let oid: ASN1ObjectIdentifier
+    let kx384: Int
+    let kx768: Int
 
-    init(_ kp: KyberParameters) {
-        self.k = kp.k
-        self.eta1 = kp.eta1
-        self.eta2 = kp.eta2
-        self.du = kp.du
-        self.dv = kp.dv
-        self.ekSize = kp.ekSize
-        self.dkSize = kp.dkSize
-        self.ctSize = kp.ctSize
-        self.k384 = self.k * 384
-        self.k768 = self.k * 768
+    init(_ kind: Kind) {
+        let param = Parameters.paramsFromKind(kind)
+        self.k = param.k
+        self.eta1 = param.eta1
+        self.eta2 = param.eta2
+        self.du = param.du
+        self.dv = param.dv
+        self.ekSize = param.ekSize
+        self.dkSize = param.dkSize
+        self.ctSize = param.ctSize
+        self.oid = param.oid
+        self.kx384 = self.k * 384
+        self.kx768 = self.k * 768
     }
     
     
@@ -276,12 +271,12 @@ public struct Kyber {
     
     //  [FIPS203] - Algorithm 14
     func K_PKEEncrypt(_ ekPKE: Bytes, _ m: Bytes, _ r: Bytes) -> Bytes {
-        assert(ekPKE.count == self.k384 + 32)
+        assert(ekPKE.count == self.kx384 + 32)
         assert(m.count == 32)
         assert(r.count == 32)
         var N = Byte(0)
         let tHat = Vector.ByteDecode(ekPKE, 12)
-        let rho = ekPKE[self.k384 ..< self.k384 + 32]
+        let rho = ekPKE[self.kx384 ..< self.kx384 + 32]
         var Ahat = Matrix(self.k)
         for i in 0 ..< self.k {
             for j in 0 ..< self.k {
@@ -311,7 +306,7 @@ public struct Kyber {
 
     //  [FIPS203] - Algorithm 15
     func K_PKEDecrypt(_ dkPKE: Bytes, _ c: Bytes) -> Bytes {
-        assert(dkPKE.count == self.k384)
+        assert(dkPKE.count == self.kx384)
         assert(c.count == (self.du * self.k + self.dv) * 32)
         let c1 = Bytes(c[0 ..< self.du * self.k << 5])
         let c2 = Bytes(c[self.du * self.k << 5 ..< (self.du * self.k + self.dv) << 5])
@@ -332,7 +327,7 @@ public struct Kyber {
 
     // [FIPS203] - Algorithm 17
     func ML_KEMEncaps_internal(_ ek: Bytes, _ m: Bytes) -> (Bytes, Bytes) {
-        assert(ek.count == self.k384 + 32)
+        assert(ek.count == self.kx384 + 32)
         assert(m.count == 32)
         let (K, r) = Kyber.G(m + Kyber.H(ek))
         return (K, K_PKEEncrypt(ek, m, r))
@@ -340,12 +335,12 @@ public struct Kyber {
 
     // [FIPS203] - Algorithm 18
     func ML_KEMDecaps_internal(_ dk: Bytes, _ c: Bytes) -> Bytes {
-        assert(dk.count == k768 + 96)
+        assert(dk.count == kx768 + 96)
         assert(c.count == (self.du * self.k + self.dv) * 32)
-        let dkPKE = dk[0 ..< self.k384]
-        let ekPKE = dk[self.k384 ..< self.k768 + 32]
-        let h = dk[self.k768 + 32 ..< self.k768 + 64]
-        let z = dk[self.k768 + 64 ..< self.k768 + 96]
+        let dkPKE = dk[0 ..< self.kx384]
+        let ekPKE = dk[self.kx384 ..< self.kx768 + 32]
+        let h = dk[self.kx768 + 32 ..< self.kx768 + 64]
+        let z = dk[self.kx768 + 64 ..< self.kx768 + 96]
         let m1 = K_PKEDecrypt(Bytes(dkPKE), c)
         let (K1, r1) = Kyber.G(m1 + h)
         let K = Kyber.J(z + c)

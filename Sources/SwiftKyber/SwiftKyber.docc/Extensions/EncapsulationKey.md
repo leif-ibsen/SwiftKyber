@@ -7,10 +7,14 @@ The encapsulation key
 ### Properties
 
 - ``keyBytes``
+- ``asn1``
+- ``pem``
+- ``description``
 
-### Constructor
+### Constructors
 
 - ``init(keyBytes:)``
+- ``init(pem:)``
 
 ### Encapsulate
 

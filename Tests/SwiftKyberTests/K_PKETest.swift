@@ -10,7 +10,8 @@ import XCTest
 
 final class K_PKETest: XCTestCase {
 
-    func doTest(_ kyber: Kyber) {
+    func doTest(_ kind: Kind) {
+        let kyber = Kyber(kind)
         for _ in 0 ..< 10 {
             var d = Bytes(repeating: 0, count: 32)
             Util.randomBytes(&d)
@@ -26,15 +27,15 @@ final class K_PKETest: XCTestCase {
     }
 
     func test512() throws {
-        doTest(Kyber.K512)
+        doTest(.K512)
     }
 
     func test768() throws {
-        doTest(Kyber.K768)
+        doTest(.K768)
     }
 
     func test1024() throws {
-        doTest(Kyber.K1024)
+        doTest(.K1024)
     }
 
 }

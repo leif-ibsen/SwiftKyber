@@ -4,11 +4,12 @@ SwiftKyber is a Swift implementation of NIST FIPS 203: *Module-Lattice-Based Key
 
 Its functionality encompasses:
 
-* Generation of key pairs
+* Support for the three Kyber kinds defined in the standard
+* Create encapsulation keys and decapsulation keys
 * A key encapsulation function
 * A key decapsulation function
-
-SwiftKyber contains three Kyber instances: Kyber.K512, Kyber.K768 and Kyber.K1024 corresponding to the three instances defined in FIPS 203.
+* Store keys in their PEM encoded ASN1 representation
+* Recreate keys from their PEM encoded ASN1 representation
 
 Its documentation is build with the DocC plugin and published on GitHub Pages at this location:
 
