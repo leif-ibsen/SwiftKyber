@@ -277,10 +277,12 @@ public struct Kyber {
         var N = Byte(0)
         let tHat = Vector.ByteDecode(ekPKE, 12)
         let rho = ekPKE[self.kx384 ..< self.kx384 + 32]
-        var Ahat = Matrix(self.k)
+        
+        // A hat transposed
+        var AhatT = Matrix(self.k)
         for i in 0 ..< self.k {
             for j in 0 ..< self.k {
-                Ahat.vectors[i].polynomials[j] = Kyber.SampleNTT(rho + [Byte(j), Byte(i)])
+                AhatT.vectors[j].polynomials[i] = Kyber.SampleNTT(rho + [Byte(j), Byte(i)])
             }
         }
         var y = Vector(self.k)
@@ -295,8 +297,7 @@ public struct Kyber {
         }
         let e2 = Kyber.SamplePolyCBD(Kyber.PRF(r, N, self.eta2), self.eta2)
         let yHat = y.NTT()
-        Ahat.transpose()
-        let u = (Ahat * yHat).INTT() + e1
+        let u = (AhatT * yHat).INTT() + e1
         let my = Polynomial.ByteDecode(m, 1).Decompress(1)
         let v = (tHat * yHat).INTT() + e2 + my
         let c1 = u.Compress(self.du).ByteEncode(self.du)
@@ -335,7 +336,7 @@ public struct Kyber {
 
     // [FIPS203] - Algorithm 18
     func ML_KEMDecaps_internal(_ dk: Bytes, _ c: Bytes) -> Bytes {
-        assert(dk.count == kx768 + 96)
+        assert(dk.count == self.kx768 + 96)
         assert(c.count == (self.du * self.k + self.dv) * 32)
         let dkPKE = dk[0 ..< self.kx384]
         let ekPKE = dk[self.kx384 ..< self.kx768 + 32]

@@ -19,7 +19,7 @@ To use SwiftKyber, in your project *Package.swift* file add a dependency like
 
 ```swift
 dependencies: [
-  .package(url: "https://github.com/leif-ibsen/SwiftKyber", from: "3.0.0"),
+  .package(url: "https://github.com/leif-ibsen/SwiftKyber", from: "3.1.0"),
 ]
 ```
 
@@ -27,13 +27,13 @@ SwiftKyber itself depends on the [ASN1](https://leif-ibsen.github.io/ASN1/docume
 
 ```swift
 dependencies: [
-  .package(url: "https://github.com/leif-ibsen/ASN1", from: "2.6.0"),
-  .package(url: "https://github.com/leif-ibsen/BigInt", from: "1.19.0"),
-  .package(url: "https://github.com/leif-ibsen/Digest", from: "1.8.0"),
+  .package(url: "https://github.com/leif-ibsen/ASN1", from: "2.7.0"),
+  .package(url: "https://github.com/leif-ibsen/BigInt", from: "1.21.0"),
+  .package(url: "https://github.com/leif-ibsen/Digest", from: "1.11.0"),
 ],
 ```
 
-SwiftKyber doesn't do big integer arithmetic, but the ASN1 package depends on the BigInt package.
+SwiftKyber does not do big integer arithmetic, but the ASN1 package depends on the BigInt package.
 
 > Important:
 SwiftKyber requires Swift 5.0. It also requires that the `Int` and `UInt` types be 64 bit types.
