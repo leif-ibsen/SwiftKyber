@@ -75,19 +75,21 @@ struct Polynomial: Equatable {
         var f = self.coefficients
         var k = 1
         var len = 128
-        while len >= 2 {
-            var start = 0
-            while start < 256 {
-                let zeta = Polynomial.zetas1[k]
-                k += 1
-                for j in start ..< start + len {
-                    let t = Kyber.reduceModQ(zeta * f[j + len])
-                    f[j + len] = Kyber.subModQ(f[j], t)
-                    f[j] = Kyber.addModQ(f[j], t)
+        f.withUnsafeMutableBufferPointer { fU in
+            while len >= 2 {
+                var start = 0
+                while start < 256 {
+                    let zeta = Polynomial.zetas1[k]
+                    k += 1
+                    for j in start ..< start + len {
+                        let t = Kyber.reduceModQ(zeta * fU[j + len])
+                        fU[j + len] = Kyber.subModQ(fU[j], t)
+                        fU[j] = Kyber.addModQ(fU[j], t)
+                    }
+                    start += len << 1
                 }
-                start += len << 1
+                len >>= 1
             }
-            len >>= 1
         }
         return Polynomial(f)
     }
@@ -98,22 +100,24 @@ struct Polynomial: Equatable {
         var f = self.coefficients
         var k = 127
         var len = 2
-        while len <= 128 {
-            var start = 0
-            while start < 256 {
-                let zeta = Polynomial.zetas1[k]
-                k -= 1
-                for j in start ..< start + len {
-                    let t = f[j]
-                    f[j] = Kyber.addModQ(t, f[j + len])
-                    f[j + len] = Kyber.reduceModQ(zeta * Kyber.subModQ(f[j + len], t))
+        f.withUnsafeMutableBufferPointer { fU in
+            while len <= 128 {
+                var start = 0
+                while start < 256 {
+                    let zeta = Polynomial.zetas1[k]
+                    k -= 1
+                    for j in start ..< start + len {
+                        let t = fU[j]
+                        fU[j] = Kyber.addModQ(t, fU[j + len])
+                        fU[j + len] = Kyber.reduceModQ(zeta * Kyber.subModQ(fU[j + len], t))
+                    }
+                    start += len << 1
                 }
-                start += len << 1
+                len <<= 1
             }
-            len <<= 1
-        }
-        for i in 0 ..< f.count {
-            f[i] = Kyber.reduceModQ(f[i] * 3303)  // 3303 = 128^-1 mod 3329
+            for i in 0 ..< 256 {
+                fU[i] = Kyber.reduceModQ(fU[i] * 3303)  // 3303 = 128^-1 mod 3329
+            }
         }
         return Polynomial(f)
     }
