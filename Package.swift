@@ -26,7 +26,6 @@ let package = Package(
         .testTarget(
             name: "SwiftKyberTests",
             dependencies: ["SwiftKyber"],
-            resources: [.copy("Resources/kat512KeyGen.rsp"), .copy("Resources/kat768KeyGen.rsp"), .copy("Resources/kat1024KeyGen.rsp"),
-                        .copy("Resources/kat512EncapDecap.rsp"), .copy("Resources/kat768EncapDecap.rsp"), .copy("Resources/kat1024EncapDecap.rsp")]),
+            resources: [.copy("Resources/katTestKeyGen.rsp"), .copy("Resources/katTestDecap.rsp"), .copy("Resources/katTestEncap.rsp")]),
     ]
 )

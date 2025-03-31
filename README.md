@@ -17,5 +17,4 @@ https://leif-ibsen.github.io/SwiftKyber/documentation/swiftkyber
 
 The documentation is also available in the *SwiftKyber.doccarchive* file.
 
-The KAT test vectors have been updated from the GitHub Rust Crypto site
-to comply with the final specification.
+The KAT test vectors come from NIST ACVP-server version 1.1.0.38 to comply with the final specification.
