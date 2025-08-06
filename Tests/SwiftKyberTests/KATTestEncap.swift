@@ -15,7 +15,7 @@ final class KATTestEncap: XCTestCase {
 
     override func setUpWithError() throws {
         let url = Bundle.module.url(forResource: "katTestEncap", withExtension: "rsp")!
-        makeEncapTests(&encapTests, try Data(contentsOf: url))
+        makeEncapTests(try Data(contentsOf: url))
     }
 
     struct encapTest {
@@ -30,7 +30,7 @@ final class KATTestEncap: XCTestCase {
 
     var encapTests: [encapTest] = []
     
-    func makeEncapTests(_ tests: inout [encapTest], _ data: Data) {
+    func makeEncapTests(_ data: Data) {
         let s = String(decoding: data, as: UTF8.self)
         var lines = s.components(separatedBy: .newlines)
         let groups = lines.count / 8
@@ -53,7 +53,7 @@ final class KATTestEncap: XCTestCase {
             let c = Base64.hex2bytes(lines[j + 4])!
             let k = Base64.hex2bytes(lines[j + 5])!
             let m = Base64.hex2bytes(lines[j + 6])!
-            tests.append(encapTest(tcId: tcId, kind: kind, ek: ek, dk: dk, c: c, k: k, m: m))
+            encapTests.append(encapTest(tcId: tcId, kind: kind, ek: ek, dk: dk, c: c, k: k, m: m))
         }
     }
 

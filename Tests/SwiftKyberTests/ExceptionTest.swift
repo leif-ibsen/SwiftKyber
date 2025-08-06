@@ -64,4 +64,15 @@ final class ExceptionTest: XCTestCase {
         }
     }
 
+    func test6() throws {
+        do {
+            let ikm = Bytes(repeating: 1, count: 65)
+            let _ = try Kyber.DeriveKeyPair(kind: .K512, ikm: ikm)
+            XCTFail("Expected ikmSize exception")
+        } catch Exception.ikmSize {
+        } catch {
+            XCTFail("Expected ikmSize exception")
+        }
+    }
+
 }

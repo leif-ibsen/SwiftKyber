@@ -15,7 +15,7 @@ final class KATTestKeyGen: XCTestCase {
 
     override func setUpWithError() throws {
         let url = Bundle.module.url(forResource: "katTestKeyGen", withExtension: "rsp")!
-        makeKeyGenTests(&keyGenTests, try Data(contentsOf: url))
+        makeKeyGenTests(try Data(contentsOf: url))
     }
 
     struct keyGenTest {
@@ -29,7 +29,7 @@ final class KATTestKeyGen: XCTestCase {
 
     var keyGenTests: [keyGenTest] = []
     
-    func makeKeyGenTests(_ tests: inout [keyGenTest], _ data: Data) {
+    func makeKeyGenTests(_ data: Data) {
         let s = String(decoding: data, as: UTF8.self)
         var lines = s.components(separatedBy: .newlines)
         let groups = lines.count / 7
@@ -50,16 +50,19 @@ final class KATTestKeyGen: XCTestCase {
             let d = Base64.hex2bytes(lines[j + 3])!
             let ek = Base64.hex2bytes(lines[j + 4])!
             let dk = Base64.hex2bytes(lines[j + 5])!
-            tests.append(keyGenTest(tcId: tcId, kind: kind, z: z, d: d, ek: ek, dk: dk))
+            keyGenTests.append(keyGenTest(tcId: tcId, kind: kind, z: z, d: d, ek: ek, dk: dk))
         }
     }
 
-    func testKeyGen() {
+    func testKeyGen() throws {
         for t in keyGenTests {
             let kyber = Kyber(t.kind)
-            let (ek, dk) = kyber.ML_KEMKeyGen_internal(t.d, t.z)
-            XCTAssertEqual(ek, t.ek)
-            XCTAssertEqual(dk, t.dk)
+            let (ek1, dk1) = kyber.ML_KEMKeyGen_internal(t.d, t.z)
+            XCTAssertEqual(ek1, t.ek)
+            XCTAssertEqual(dk1, t.dk)
+            let (ek2, dk2) = try Kyber.DeriveKeyPair(kind: t.kind, ikm: t.d + t.z)
+            XCTAssertEqual(ek2.keyBytes, t.ek)
+            XCTAssertEqual(dk2.keyBytes, t.dk)
         }
     }
 

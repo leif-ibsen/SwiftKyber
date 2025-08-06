@@ -29,4 +29,7 @@ public enum Exception: Error {
     /// Wrong PEM structure
     case pemStructure
     
+    /// Wrong ikm size
+    case ikmSize
+    
 }

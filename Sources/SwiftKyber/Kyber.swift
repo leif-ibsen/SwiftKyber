@@ -35,6 +35,28 @@ public struct Kyber {
             fatalError("GenerateKeyPair inconsistency")
         }
     }
+    
+    /// Derives an encapsulation key and a decapsulation key based on keying material
+    ///
+    /// - Parameters:
+    ///   - kind: The Kyber kind
+    ///   - ikm: The keying material - 64 bytes
+    /// - Returns: The encapsulation key `encap` and the decapsulation key `decap`
+    /// - Throws: An exception if the `ikm` size is not 64
+    /// - `DeriveKeyPair` is deterministic, the generated keys depend only on the keying material
+    public static func DeriveKeyPair(kind: Kind, ikm: Bytes) throws -> (encap: EncapsulationKey, decap: DecapsulationKey) {
+        guard ikm.count == 64 else {
+            throw Exception.ikmSize
+        }
+        do {
+            let kyber = Kyber(kind)
+            let (encap, decap) = kyber.ML_KEMKeyGen_internal(Bytes(ikm[0 ..< 32]), Bytes(ikm[32 ..< 64]))
+            return (try EncapsulationKey(encap, kyber), try DecapsulationKey(decap, kyber))
+        } catch {
+            // Shouldn't happen
+            fatalError("DeriveKeyPair inconsistency")
+        }
+    }
 
     static func randomBytes(_ n: Int) -> Bytes {
         var bytes = Bytes(repeating: 0, count: n)

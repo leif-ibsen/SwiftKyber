@@ -15,7 +15,7 @@ final class KATTestDecap: XCTestCase {
 
     override func setUpWithError() throws {
         let url = Bundle.module.url(forResource: "katTestDecap", withExtension: "rsp")!
-        makeDecapTests(&decapTests, try Data(contentsOf: url))
+        makeDecapTests(try Data(contentsOf: url))
     }
 
     struct decapTest {
@@ -29,7 +29,7 @@ final class KATTestDecap: XCTestCase {
 
     var decapTests: [decapTest] = []
     
-    func makeDecapTests(_ tests: inout [decapTest], _ data: Data) {
+    func makeDecapTests(_ data: Data) {
         let s = String(decoding: data, as: UTF8.self)
         var lines = s.components(separatedBy: .newlines)
         let groups = lines.count / 7
@@ -50,7 +50,7 @@ final class KATTestDecap: XCTestCase {
             let dk = Base64.hex2bytes(lines[j + 3])!
             let c = Base64.hex2bytes(lines[j + 4])!
             let k = Base64.hex2bytes(lines[j + 5])!
-            tests.append(decapTest(tcId: tcId, kind: kind, ek: ek, dk: dk, c: c, k: k))
+            decapTests.append(decapTest(tcId: tcId, kind: kind, ek: ek, dk: dk, c: c, k: k))
         }
     }
 
