@@ -19,7 +19,7 @@ To use SwiftKyber, in your project *Package.swift* file add a dependency like
 
 ```swift
 dependencies: [
-  .package(url: "https://github.com/leif-ibsen/SwiftKyber", from: "3.4.0"),
+  .package(url: "https://github.com/leif-ibsen/SwiftKyber", from: "3.5.0"),
 ]
 ```
 
@@ -28,7 +28,7 @@ SwiftKyber itself depends on the [ASN1](https://leif-ibsen.github.io/ASN1/docume
 ```swift
 dependencies: [
   .package(url: "https://github.com/leif-ibsen/ASN1", from: "2.7.0"),
-  .package(url: "https://github.com/leif-ibsen/BigInt", from: "1.21.0"),
+  .package(url: "https://github.com/leif-ibsen/BigInt", from: "1.23.0"),
   .package(url: "https://github.com/leif-ibsen/Digest", from: "1.13.0"),
 ],
 ```

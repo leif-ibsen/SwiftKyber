@@ -46,7 +46,7 @@ struct Polynomial: Equatable {
     func Compress(_ d: Int) -> Polynomial {
         var x = Polynomial()
         for i in 0 ..< 256 {
-            x.coefficients[i] = Kyber.Compress(self.coefficients[i], d)
+            x[i] = Kyber.Compress(self[i], d)
         }
         return x
     }
@@ -54,7 +54,7 @@ struct Polynomial: Equatable {
     func Decompress(_ d: Int) -> Polynomial {
         var x = Polynomial()
         for i in 0 ..< 256 {
-            x.coefficients[i] = Kyber.Decompress(self.coefficients[i], d)
+            x[i] = Kyber.Decompress(self[i], d)
         }
         return x
     }
@@ -127,10 +127,10 @@ struct Polynomial: Equatable {
     static func *(_ f: Polynomial, _ g: Polynomial) -> Polynomial {
         var h = [Int](repeating: 0, count: 256)
         for i in stride(from: 0, to: 256, by: 2) {
-            let x1 = f.coefficients[i]
-            let x2 = f.coefficients[i + 1]
-            let y1 = g.coefficients[i]
-            let y2 = g.coefficients[i + 1]
+            let x1 = f[i]
+            let x2 = f[i + 1]
+            let y1 = g[i]
+            let y2 = g[i + 1]
             let z = zetas2[i >> 1]
             h[i] = Kyber.addModQ(Kyber.reduceModQ(x1 * y1), Kyber.reduceModQ(z * Kyber.reduceModQ(x2 * y2)))
             h[i + 1] = Kyber.addModQ(Kyber.reduceModQ(x2 * y1), Kyber.reduceModQ(x1 * y2))
@@ -148,7 +148,7 @@ struct Polynomial: Equatable {
     // p1 += p2
     static func +=(_ p1: inout Polynomial, _ p2: Polynomial) {
         for i in 0 ..< 256 {
-            p1.coefficients[i] = Kyber.addModQ(p1.coefficients[i], p2.coefficients[i])
+            p1[i] = Kyber.addModQ(p1[i], p2[i])
         }
     }
 
@@ -162,8 +162,20 @@ struct Polynomial: Equatable {
     // p1 -= p2
     static func -=(_ p1: inout Polynomial, _ p2: Polynomial) {
         for i in 0 ..< 256 {
-            p1.coefficients[i] = Kyber.subModQ(p1.coefficients[i], p2.coefficients[i])
+            p1[i] = Kyber.subModQ(p1[i], p2[i])
         }
     }
     
+}
+
+extension Polynomial {
+    
+    subscript(i: Int) -> Int {
+        get {
+            return self.coefficients[i]
+        }
+        set {
+            self.coefficients[i] = newValue
+        }
+    }
 }

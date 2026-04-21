@@ -19,7 +19,7 @@ struct Vector: Equatable {
     func Compress(_ d: Int) -> Vector {
         var x = Vector(self.n)
         for i in 0 ..< x.n {
-            x.polynomials[i] = self.polynomials[i].Compress(d)
+            x[i] = self[i].Compress(d)
         }
         return x
     }
@@ -27,7 +27,7 @@ struct Vector: Equatable {
     func Decompress(_ d: Int) -> Vector {
         var x = Vector(self.n)
         for i in 0 ..< x.n {
-            x.polynomials[i] = self.polynomials[i].Decompress(d)
+            x[i] = self[i].Decompress(d)
         }
         return x
     }
@@ -36,7 +36,7 @@ struct Vector: Equatable {
         assert(0 < d && d <= 12)
         var x: Bytes = []
         for i in 0 ..< self.n {
-            x += self.polynomials[i].ByteEncode(d)
+            x += self[i].ByteEncode(d)
         }
         return x
     }
@@ -47,7 +47,7 @@ struct Vector: Equatable {
         var v = Vector(n)
         var from = 0
         for i in 0 ..< n {
-            v.polynomials[i] = Polynomial(Kyber.ByteDecode(Bytes(x[from ..< from + step]), d))
+            v[i] = Polynomial(Kyber.ByteDecode(Bytes(x[from ..< from + step]), d))
             from += step
         }
         return v
@@ -57,7 +57,7 @@ struct Vector: Equatable {
     func NTT() -> Vector {
         var v = Vector(self.n)
         for i in 0 ..< self.n {
-            v.polynomials[i] = self.polynomials[i].NTT()
+            v[i] = self[i].NTT()
         }
         return v
     }
@@ -66,7 +66,7 @@ struct Vector: Equatable {
     func INTT() -> Vector {
         var v = Vector(self.n)
         for i in 0 ..< self.n {
-            v.polynomials[i] = self.polynomials[i].INTT()
+            v[i] = self[i].INTT()
         }
         return v
     }
@@ -76,7 +76,7 @@ struct Vector: Equatable {
         assert(v1.n == v2.n)
         var sum = Vector(v1.n)
         for i in 0 ..< sum.n {
-            sum.polynomials[i] = v1.polynomials[i] + v2.polynomials[i]
+            sum[i] = v1[i] + v2[i]
         }
         return sum
     }
@@ -86,10 +86,21 @@ struct Vector: Equatable {
         assert(v1.n == v2.n)
         var pol = Polynomial()
         for i in 0 ..< v1.n {
-            pol += v1.polynomials[i] * v2.polynomials[i]
+            pol += v1[i] * v2[i]
         }
         return pol
     }
 
 }
 
+extension Vector {
+    
+    subscript(i: Int) -> Polynomial {
+        get {
+            return self.polynomials[i]
+        }
+        set {
+            self.polynomials[i] = newValue
+        }
+    }
+}
